@@ -2,22 +2,22 @@ from enum import Enum
 from typing import Optional
 
 
-class CellName(Enum):
-    CELL_X = 1
-    CELL_O = 0
+class Symbol(Enum):
+    X = 1
+    O = 0
 
 
 class Cell:
     def __init__(self):
-        self._symbol: Optional[CellName] = None
+        self._symbol: Optional[Symbol] = None
 
     @property
-    def symbol(self) -> CellName:
+    def symbol(self) -> Symbol:
         return self._symbol
 
     @symbol.setter
-    def symbol(self, symbol: CellName):
-        if not isinstance(symbol, CellName):
+    def symbol(self, symbol: Symbol):
+        if not isinstance(symbol, Symbol):
             raise ValueError('Need only CellName')
 
         if self.symbol is not None:

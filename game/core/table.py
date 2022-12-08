@@ -1,6 +1,6 @@
 import copy
 from enum import Enum
-from cell import Cell, CellName
+from cell import Cell, Symbol
 
 
 class TableSize(Enum):
@@ -24,7 +24,7 @@ class Table:
     def get_table(self):
         return copy.deepcopy(self._table)
 
-    def set_symbol_cell(self, index: int, symbol: CellName):
+    def set_symbol_cell(self, index: int, symbol: Symbol):
         size: int = self.size.value
 
         if index > size:

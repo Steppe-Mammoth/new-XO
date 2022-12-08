@@ -1,5 +1,5 @@
 import pytest
-from game.core.cell import Cell, CellName
+from game.core.cell import Cell, Symbol
 
 
 def test_set_cell_value_error():
@@ -10,13 +10,13 @@ def test_set_cell_value_error():
 
 def test_set_cell_true():
     cell = Cell()
-    cell.symbol = CellName.CELL_O
-    assert (cell.symbol in CellName)
+    cell.symbol = Symbol.O
+    assert (cell.symbol in Symbol)
 
 
 def test_reset_symbol_cell():
     c = Cell()
-    c.symbol = CellName.CELL_O
+    c.symbol = Symbol.O
 
     with pytest.raises(IOError):
-        c.symbol = CellName.CELL_X
+        c.symbol = Symbol.X
