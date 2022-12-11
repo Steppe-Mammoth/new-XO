@@ -1,26 +1,20 @@
-from enum import Enum
-from typing import Optional
+from game.core.symbol import Symbol, symbol_check
 
 
-class Symbol(Enum):
-    X = 1
-    O = 0
+class CellMeta:
+    def __new__(cls, symbol):
+        symbol_check(symbol)
+        instance = super().__new__(cls)
+        return instance
+
+    def __deepcopy__(self, memo):
+        return self
 
 
-class Cell:
-    def __init__(self):
-        self._symbol: Optional[Symbol] = None
+class Cell(CellMeta):
+    def __init__(self, symbol: Symbol):
+        self.__symbol = symbol
 
     @property
     def symbol(self) -> Symbol:
-        return self._symbol
-
-    @symbol.setter
-    def symbol(self, symbol: Symbol):
-        if not isinstance(symbol, Symbol):
-            raise ValueError('Need only CellName')
-
-        if self.symbol is not None:
-            raise IOError(f'This cell is used. Cell symbol now {self.symbol.name}, you send {symbol.name}', )
-
-        self._symbol = symbol
+        return self.__symbol
