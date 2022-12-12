@@ -1,8 +1,8 @@
 import pytest
-import numpy as np
-from game.core.cell import Cell
 from game.core.symbol import Symbol
-from game.core.table import Table, AllowedTableParameter, TableParam
+from game.core.table.param import AllowedTableParameter, TableParam
+from game.core.table.table import Table
+from game.exceptions.core_exceptions import CellAlreadyUsedError, TableIndexError, TableParametersError
 
 
 def build_table() -> Table:
@@ -16,14 +16,29 @@ def test_table_init_default_true():
     assert default_table == table1
 
 
+def test_table_init_user_true():
+    default_table = tuple([None for x in range(10)] for y in range(8))
+    Table.ONLY_ALLOWED_TABLE_PARAMETERS = False
+
+    table1 = Table(param=TableParam(10, 8, 8)).table
+    assert default_table == table1
+
+    Table.ONLY_ALLOWED_TABLE_PARAMETERS = True
+
+
 def test_table_init_error():
-    with pytest.raises(ValueError):
+    with pytest.raises(TableParametersError):
         param = TableParam(ROW=5, COLUMN=10, COMBINATION=3)
         t = Table(param=param)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TableParametersError):
         param = TableParam(ROW=3, COLUMN=3, COMBINATION=3)
         t = Table(param=param)
+
+    with pytest.raises(TableParametersError):
+        param = "2323232"
+        t = Table(param=param)
+
 
 
 def test_set_symbol_cell_true():
@@ -42,14 +57,20 @@ def test_set_symbol_cell_true():
 def test_set_symbol_cell_index_error():
     table = build_table()
 
-    with pytest.raises(IndexError):
+    with pytest.raises(TableIndexError):
         table.set_symbol_cell(index_column=1, index_row=3, symbol=Symbol.X)
 
-    with pytest.raises(IndexError):
+    with pytest.raises(TableIndexError):
         table.set_symbol_cell(index_column=3, index_row=1, symbol=Symbol.O)
 
-    with pytest.raises(IndexError):
+    with pytest.raises(TableIndexError):
         table.set_symbol_cell(index_column=3, index_row=3, symbol=Symbol.O)
+
+    with pytest.raises(TableIndexError):
+        table.set_symbol_cell(index_column=-1, index_row=2, symbol=Symbol.O)
+
+    with pytest.raises(TableIndexError):
+        table.set_symbol_cell(index_column=2, index_row=-1, symbol=Symbol.O)
 
 
 def test_reset_symbol_cell():
@@ -59,11 +80,11 @@ def test_reset_symbol_cell():
     table.set_symbol_cell(index_column=1, index_row=2, symbol=Symbol.O)
     table.set_symbol_cell(index_column=0, index_row=1, symbol=Symbol.O)
 
-    with pytest.raises(IOError):
+    with pytest.raises(CellAlreadyUsedError):
         table.set_symbol_cell(index_column=2, index_row=1, symbol=Symbol.X)
 
-    with pytest.raises(IOError):
+    with pytest.raises(CellAlreadyUsedError):
         table.set_symbol_cell(index_column=1, index_row=2, symbol=Symbol.O)
 
-    with pytest.raises(IOError):
+    with pytest.raises(CellAlreadyUsedError):
         table.set_symbol_cell(index_column=0, index_row=1, symbol=Symbol.X)

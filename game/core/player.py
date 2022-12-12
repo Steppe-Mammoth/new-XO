@@ -1,9 +1,12 @@
-from game.core.symbol import Symbol, symbol_check
+from game.core.symbol import Symbol
+from game.exceptions.core_exceptions import SymbolError
 
 
 class Player:
     def __new__(cls, name, symbol):
-        symbol_check(symbol)
+        if not isinstance(symbol, Symbol):
+            raise SymbolError
+
         instance = super().__new__(cls)
         return instance
 
