@@ -1,16 +1,17 @@
 import pytest
-from game.core.cell import Cell
+from game.core.table.cell import Cell
 from game.core.symbol import Symbol
+from game.exceptions.core_exceptions import SymbolError
 
 
 def test_set_cell_value_error():
-    with pytest.raises(ValueError):
+    with pytest.raises(SymbolError):
         Cell("0")
 
-    with pytest.raises(ValueError):
+    with pytest.raises(SymbolError):
         Cell(3)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(SymbolError):
         Cell(Symbol)
 
 
