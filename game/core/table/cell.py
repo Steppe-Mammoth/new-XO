@@ -13,7 +13,7 @@ class CellMeta:
 
 
 class Cell(CellMeta):
-    __slots__ = '__symbol',
+    __slots__ = "__symbol",
 
     def __init__(self, symbol: Symbol):
         self.__symbol = symbol
