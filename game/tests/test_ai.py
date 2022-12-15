@@ -1,5 +1,5 @@
+from game.core.AI import FindCellAI
 from game.core.symbol import Symbol
-from game.core.cheker import CheckerTable
 from game.core.table.param import AllowedTableParameter
 from game.core.table.table import Table
 
@@ -8,37 +8,50 @@ def build_table():
     return Table(param=AllowedTableParameter.DEFAULT)
 
 
-def set_steps_return_tables():
-    t1 = build_table()
-    t1.set_symbol_cell(0, 0, symbol=Symbol.O) #
-    t1.set_symbol_cell(1, 1, symbol=Symbol.O)
-    t1.set_symbol_cell(1, 0, symbol=Symbol.X)
-    t1.set_symbol_cell(2, 1, symbol=Symbol.X)
-    t1.set_symbol_cell(0, 1, symbol=Symbol.O) #
-    t1.set_symbol_cell(2, 2, symbol=Symbol.X)
-    t1.set_symbol_cell(0, 2, symbol=Symbol.O) #
+def test_ai_3_3_3_3_fist_step():
+    t = build_table()
+    ai_all_step = FindCellAI.find_best_step(symbol=Symbol.X, table=t.table, combinations=t.combinations)
+    ai_get_step = FindCellAI.get_best_step(symbol=Symbol.X, table=t.table, combinations=t.combinations)
+    assert ai_all_step == [list(comb) for comb in t.combinations]
+    assert len(ai_all_step) == 8
+    assert len(ai_get_step) == 2
 
-    t2 = build_table()
-    t2.set_symbol_cell(0, 1, symbol=Symbol.O) #
-    t2.set_symbol_cell(1, 1, symbol=Symbol.O) #
-    t2.set_symbol_cell(2, 0, symbol=Symbol.X)
-    t2.set_symbol_cell(0, 0, symbol=Symbol.X)
-    t2.set_symbol_cell(2, 2, symbol=Symbol.X)
-    t2.set_symbol_cell(0, 2, symbol=Symbol.X)
-    t2.set_symbol_cell(2, 1, symbol=Symbol.O) #
 
-    return t1, t2
+def test_ai_3_3_3_1_my_win():
+    t = build_table()
 
-def test_result():
-    t1, t2 = set_steps_return_tables()
-    result_O_table1 = CheckerTable.check_table_for_player(symbol=Symbol.O, table=t1.table, size_combination=t1.param.COMBINATION)
-    result_X_table1 = CheckerTable.check_table_for_player(symbol=Symbol.X, table=t1.table, size_combination=t1.param.COMBINATION)
+    t.set_symbol_cell(index_row=1, index_column=2, symbol=Symbol.X)  #
+    t.set_symbol_cell(index_row=2, index_column=1, symbol=Symbol.O)
+    t.set_symbol_cell(index_row=1, index_column=0, symbol=Symbol.X)  #
+    t.set_symbol_cell(index_row=2, index_column=0, symbol=Symbol.O)
 
-    result_O_table2 = CheckerTable.check_table_for_player(symbol=Symbol.O, table=t2.table, size_combination=t2.param.COMBINATION)
-    result_X_table2 = CheckerTable.check_table_for_player(symbol=Symbol.X, table=t2.table, size_combination=t2.param.COMBINATION)
+    ai_all_step = FindCellAI.find_best_step(symbol=Symbol.X, table=t.table, combinations=t.combinations)
+    ai_get_step = FindCellAI.get_best_step(symbol=Symbol.X, table=t.table, combinations=t.combinations)
+    assert ai_all_step == (1, 1)
+    assert ai_get_step == (1, 1)
 
-    assert result_O_table1 == [(0, 0), (0, 1), (0, 2)]
-    assert result_X_table1 is None
 
-    assert result_O_table2 == [(0, 1), (1, 1), (2, 1)]
-    assert result_X_table2 is None
+def test_ai_3_3_3_2_my_second_step():
+    t = build_table()
+    t.set_symbol_cell(index_row=2, index_column=0, symbol=Symbol.O)
+    t.set_symbol_cell(index_row=1, index_column=0, symbol=Symbol.X)  #
+
+    ai_all_step = FindCellAI.find_best_step(symbol=Symbol.X, table=t.table, combinations=t.combinations)
+    ai_get_step = FindCellAI.get_best_step(symbol=Symbol.X, table=t.table, combinations=t.combinations)
+
+    assert len(ai_all_step) == 1
+    assert ai_all_step == [[(1, 1), (1, 2)]]
+    assert ai_get_step == (1, 1) or ai_get_step == (1, 2)
+
+
+def test_ai_3_3_3_1_fail_to_win_enemy():
+    t = build_table()
+    t.set_symbol_cell(index_row=0, index_column=2, symbol=Symbol.X)  #
+    t.set_symbol_cell(index_row=2, index_column=0, symbol=Symbol.O)
+    t.set_symbol_cell(index_row=1, index_column=0, symbol=Symbol.X)  #
+    t.set_symbol_cell(index_row=2, index_column=1, symbol=Symbol.O)
+
+    ai_all_step = FindCellAI.find_best_step(symbol=Symbol.X, table=t.table, combinations=t.combinations)
+    ai_get_step = FindCellAI.get_best_step(symbol=Symbol.X, table=t.table, combinations=t.combinations)
+    assert ai_all_step == (2, 2)
+    assert ai_get_step == (2, 2)

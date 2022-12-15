@@ -27,6 +27,8 @@ def test_table_init_user_true():
 
 
 def test_table_init_error():
+    Table.ONLY_ALLOWED_TABLE_PARAMETERS = True
+
     with pytest.raises(TableParametersError):
         param = TableParam(ROW=5, COLUMN=10, COMBINATION=3)
         t = Table(param=param)
@@ -44,21 +46,21 @@ def test_table_init_error():
 def test_set_symbol_cell_true():
     table = build_table()
 
-    table.set_symbol_cell(index_column=2, index_row=2, symbol=Symbol.O)
+    table.set_symbol_cell(index_row=2, index_column=2, symbol=Symbol.O)
     assert table.table[2][2].symbol == Symbol.O
 
-    table.set_symbol_cell(index_column=1, index_row=1, symbol=Symbol.X)
+    table.set_symbol_cell(index_row=1, index_column=1, symbol=Symbol.X)
     assert table.table[1][1].symbol == Symbol.X
 
-    table.set_symbol_cell(index_column=0, index_row=1, symbol=Symbol.X)
-    assert table.table[0][1].symbol == Symbol.X
+    table.set_symbol_cell(index_row=1, index_column=0, symbol=Symbol.X)
+    assert table.table[1][0].symbol == Symbol.X
 
 
 def test_set_symbol_cell_index_error():
     table = build_table()
 
     with pytest.raises(TableIndexError):
-        table.set_symbol_cell(index_column=1, index_row=3, symbol=Symbol.X)
+        table.set_symbol_cell(index_row=1, index_column=3, symbol=Symbol.X)
 
     with pytest.raises(TableIndexError):
         table.set_symbol_cell(index_column=3, index_row=1, symbol=Symbol.O)

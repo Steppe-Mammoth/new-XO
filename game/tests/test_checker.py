@@ -1,5 +1,5 @@
+from game.core.cheker import Checker
 from game.core.symbol import Symbol
-from game.core.cheker import CheckerTable
 from game.core.table.param import AllowedTableParameter
 from game.core.table.table import Table
 
@@ -31,14 +31,14 @@ def set_steps_return_tables():
 
 def test_result():
     t1, t2 = set_steps_return_tables()
-    result_O_table1 = CheckerTable.check_table_for_player(symbol=Symbol.O, table=t1.table, size_combination=t1.param.COMBINATION)
-    result_X_table1 = CheckerTable.check_table_for_player(symbol=Symbol.X, table=t1.table, size_combination=t1.param.COMBINATION)
+    result_O_table1 = Checker.get_result_for_player(symbol=Symbol.O, table=t1.table, combinations=t1.combinations)
+    result_X_table1 = Checker.get_result_for_player(symbol=Symbol.X, table=t1.table, combinations=t1.combinations)
 
-    result_O_table2 = CheckerTable.check_table_for_player(symbol=Symbol.O, table=t2.table, size_combination=t2.param.COMBINATION)
-    result_X_table2 = CheckerTable.check_table_for_player(symbol=Symbol.X, table=t2.table, size_combination=t2.param.COMBINATION)
+    result_O_table2 = Checker.get_result_for_player(symbol=Symbol.O, table=t2.table, combinations=t2.combinations)
+    result_X_table2 = Checker.get_result_for_player(symbol=Symbol.X, table=t2.table, combinations=t2.combinations)
 
-    assert result_O_table1 == [(0, 0), (0, 1), (0, 2)]
+    assert result_O_table1 == ((0, 0), (0, 1), (0, 2))
     assert result_X_table1 is None
 
-    assert result_O_table2 == [(0, 1), (1, 1), (2, 1)]
+    assert result_O_table2 == ((0, 1), (1, 1), (2, 1))
     assert result_X_table2 is None
