@@ -1,51 +1,57 @@
 import random
-from typing import Any, NamedTuple
-
-from game.core.symbol import Symbol
-from game.core.table.table import Table, AllowedTableParameter
-
-
-class Steps(NamedTuple):
-    free_cells: list[tuple[int, int]]
-    my_steps: list[tuple[int, int]]
-    enemy_steps: list[tuple[int, int]]
-
-
-table = Table(AllowedTableParameter.DEFAULT)
-table.set_symbol_cell(index_row=1, index_column=2, symbol=Symbol.X)
+from game.core.table.cell import Cell
 
 
 class FindCellAI:
+    @classmethod
+    def get_best_step(cls, symbol, table: list[tuple[Cell]], combinations: list[tuple[tuple]]):
+        step = cls.find_best_step(symbol, table=table, combinations=combinations)
+
+        if not isinstance(step[0], int):
+            step = random.choice(random.choice(step))
+
+        return step
 
     @classmethod
-    def find_all_steps_in_tablr(cls, table: tuple[list[Any]], my_symbol: Symbol, size_combination: int):
-        free_cells = []
-        my_steps = []
-        enemy_steps = []
+    def find_best_step(cls, symbol, table: list[tuple[Cell]], combinations: list[tuple[tuple]]):
+        my_priority_steps = []
+        enemy_win_cell = ()
 
-        for index_row, row in enumerate(table):
-            for index_cell, cell in enumerate(row):
+        for combination in combinations:
+
+            count_my_cell = 0
+            count_enemy_cell = 0
+            count_empty = 0
+            empty_cells = []
+
+            for step_comb in combination:
+                index_row, index_cell = step_comb
+                cell = table[index_row][index_cell]
+
                 if cell is None:
-                    free_cells.append((index_row, index_cell))
-                elif cell.symbol == my_symbol:
-                    my_steps.append((index_row, index_cell))
+                    count_empty += 1
+                    empty_cells.append(step_comb)
+
+                elif cell.symbol == symbol:
+                    count_my_cell += 1
                 else:
-                    enemy_steps.append((index_row, index_cell))
+                    count_enemy_cell += 1
 
-        return Steps(free_cells=free_cells, my_steps=my_steps, enemy_steps=enemy_steps)
+            if not count_enemy_cell:  # Only my_cell + empty_cell in combination
+                if count_empty == 1:  # One my step left to win this combination
+                    return empty_cells[0]
 
-    @classmethod
-    def find_best_step(cls, steps: Steps, size_combinations: int):
-        my_best_steps = []
-        enemy_best_steps = []
+                elif not my_priority_steps or len(my_priority_steps[0]) > count_empty:
+                    my_priority_steps = list([empty_cells])
 
-        if len(steps.my_steps) == 0:
-            return random.choice(steps.free_cells)
+                elif len(my_priority_steps[0]) == count_empty:
+                    my_priority_steps.append(empty_cells)
 
-        for step in steps.my_steps:
-            pass
+            elif not count_my_cell:  # Only enemy_cell + empty_cell in combination
+                if count_empty == 1:  # One enemy step left to win this combination
+                    enemy_win_cell = empty_cells[0]
 
-
-
-
-a = FindCellAI.find_all_steps_in_tablr(table.table, my_symbol=Symbol.X, size_combination=table.param.COMBINATION)
+        if enemy_win_cell:
+            return enemy_win_cell
+        else:
+            return my_priority_steps
