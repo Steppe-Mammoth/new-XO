@@ -3,6 +3,8 @@ from game.exceptions.core_exceptions import SymbolError
 
 
 class Player:
+    __slots__ = "name", "symbol", "count_steps"
+
     def __new__(cls, name, symbol):
         if not isinstance(symbol, Symbol):
             raise SymbolError
