@@ -4,7 +4,7 @@ from game.core.table.cell import Cell
 
 class FindCellAI:
     @classmethod
-    def get_best_step(cls, symbol, table: list[tuple[Cell]], combinations: list[tuple[tuple]]):
+    def get_best_step(cls, symbol, table: list[tuple[Cell]], combinations: list[tuple[tuple]]) -> tuple:
         step = cls.find_best_step(symbol, table=table, combinations=combinations)
 
         if not isinstance(step[0], int):
