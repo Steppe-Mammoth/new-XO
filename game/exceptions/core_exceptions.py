@@ -8,7 +8,7 @@ class CellAlreadyUsedError(Exception):
         self.new_cell = new_cell
 
     def __str__(self):
-        return """
+        return f"""
         THIS CELL IS USED. Cell symbol now = {self.used_cell.name}, you send = {self.new_cell.name}
         """
 
@@ -20,7 +20,7 @@ class TableIndexError(Exception):
         self.table_param = table_param
 
     def __str__(self):
-        return """
+        return f"""
         NOT ALLOWED INDEX for setting symbol in table
         INDEX_COLUMN: You send <{self.index_column}> | Possible: MAX <{self.table_param.COLUMN - 1}> MIN <0> index.
         INDEX_ROW: You send <{self.index_row}> | Possible: MAX <{self.table_param.ROW - 1}> MIN <0> index.
