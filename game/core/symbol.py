@@ -1,6 +1,6 @@
-from typing import NamedTuple
+class Symbol:
+    __slots__ = "name", "value"
 
-
-class Symbol(NamedTuple):
-    name: str
-    value: int | str
+    def __init__(self, name: str, value: int):
+        self.name = name
+        self.value = value
