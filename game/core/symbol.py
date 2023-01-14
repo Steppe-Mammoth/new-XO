@@ -1,8 +1,6 @@
-from enum import Enum, verify, UNIQUE
+from typing import NamedTuple
 
 
-@verify(UNIQUE)
-class Symbol(Enum):
-    X = 1
-    O = 2
-
+class Symbol(NamedTuple):
+    name: str
+    value: int | str
