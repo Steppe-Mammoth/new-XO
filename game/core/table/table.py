@@ -1,57 +1,76 @@
-from typing import Any, Union
+from typing import Any, Tuple, List, Sequence
+from abc import ABC, abstractmethod
 
-from game.core.table.combinations import Combinations
+from game.core.table.combinations import CombDefault, CombinationsBase
+from game.core.table.annotations import CombsType
 from game.core.table.cell import Cell
 
 from game.core.symbol import Symbol
-from game.core.table.param import TableParam, AllowedTableParameter
+from game.core.table.param import TableParam
 from game.exceptions.core_exceptions import CellAlreadyUsedError, TableIndexError, TableParametersError
 
 
-class TableMeta:
-    ONLY_ALLOWED_TABLE_PARAMETERS = False
-
-    def __new__(cls, param):
-        if cls.ONLY_ALLOWED_TABLE_PARAMETERS:
-            if not isinstance(param, AllowedTableParameter):
-                raise TableParametersError
-        else:
-            if not isinstance(param, TableParam) and not isinstance(param, AllowedTableParameter):
-                raise TableParametersError
-
-        instance = super().__new__(cls)
-        return instance
+def create_2d_list(row: int, column: int, default_obj: Any = None) -> Tuple[List[Any | None]]:
+    return tuple([default_obj for x in range(row)] for y in range(column))
 
 
-class Table(TableMeta):
-    __slots__ = "_param", "_table", "_combinations"
+class TableBase(ABC):
+    __slots__ = "_param", "_table", "_combinations", "_count_free_cells"
 
-    def __init__(self, param: Union[AllowedTableParameter, TableParam]):
-        if isinstance(param, AllowedTableParameter):
-            param = param.value
+    def __init__(self, param: TableParam, combinations: CombinationsBase):
 
-        self._param: TableParam = param
-        self._table = create_2d_list(column=self._param.COLUMN,
-                                     row=self._param.ROW,
-                                     default_obj=None)
+        if not isinstance(param, TableParam):
+            raise TableParametersError
+        if not isinstance(combinations, CombinationsBase):
+            raise ValueError('Need class CombinationsBase')  # make exception
 
-        self._combinations = Combinations.get_combinations(size_row=self._param.ROW,
-                                                           size_column=self._param.COLUMN,
-                                                           size_combination=self._param.COMBINATION)
+        self._table: Sequence[List[None | Cell]]
+        self._create_table(param=param)
+
+        self._param = param
+        self._count_free_cells: int = param.ROW * param.COLUMN
+        self._combinations = combinations.get_combinations(size_row=param.ROW,
+                                                           size_column=param.COLUMN,
+                                                           size_combination=param.COMBINATION)
+
+    @abstractmethod
+    def set_symbol_cell(self, index_row: int, index_column: int, symbol: Symbol):
+        if self.count_free_cells > 0:
+            ...
+        self._remove_free_cell()
 
     @property
-    def param(self):
+    def param(self) -> TableParam:
         return self._param
 
-    @property
-    def table(self):
+    @property  # Перезначати, тим хто піклується про безпеку, бо повертаються змінюванні об'єкти
+    def table(self) -> Sequence[List[Cell | None]]:
         return self._table
 
-    @property
-    def combinations(self):
+    @property  # Перезначати, тим хто піклується про безпеку, бо повертаються змінюванні об'єкти
+    def combinations(self) -> CombsType:
         return self._combinations
 
+    @property
+    def count_free_cells(self):
+        return self._count_free_cells
+
+    def _remove_free_cell(self):
+        self._count_free_cells -= 1
+
+    def _create_table(self, param: TableParam):
+        self._table = create_2d_list(row=param.ROW, column=param.COLUMN, default_obj=None)
+
+
+class TableDefault(TableBase):
+
+    def __init__(self, param: TableParam, combinations: CombinationsBase = CombDefault()):
+        super().__init__(param, combinations=combinations)
+
     def set_symbol_cell(self, index_row: int, index_column: int, symbol: Symbol):
+        if self.count_free_cells == 0:
+            raise AttributeError('ALL USED CELLS')
+
         param = self._param
         table = self._table
 
@@ -63,7 +82,4 @@ class Table(TableMeta):
             raise CellAlreadyUsedError(used_cell.symbol, new_cell=symbol)
 
         table[index_row][index_column] = Cell(symbol=symbol)
-
-
-def create_2d_list(column: int, row: int, default_obj: any) -> tuple[list[Any]]:
-    return tuple([default_obj for x in range(row)] for y in range(column))
+        self._remove_free_cell()

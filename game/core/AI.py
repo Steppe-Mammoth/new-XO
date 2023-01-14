@@ -1,11 +1,33 @@
 import random
+from abc import ABC, abstractmethod
+from typing import List, Sequence, Union
+
+from game.core.symbol import Symbol
+from game.core.table.annotations import CellIndex, CombsType
 from game.core.table.cell import Cell
 
 
-class FindCellAI:
+ListCombsType = List[List[CellIndex]]
+
+
+class AIFindBase(ABC):
+    @abstractmethod
+    def get_best_step(self,
+                      symbol: Symbol,
+                      table: Sequence[List[Cell | None]],
+                      combinations: CombsType) -> CellIndex:
+        pass
+
+
+class AIFindDefault(AIFindBase):
     @classmethod
-    def get_best_step(cls, symbol, table: list[tuple[Cell]], combinations: list[tuple[tuple]]) -> tuple:
-        step = cls.find_best_step(symbol, table=table, combinations=combinations)
+    def get_best_step(cls,
+                      symbol: Symbol,
+                      table: Sequence[List[Cell | None]],
+                      combinations: CombsType) -> CellIndex:
+
+        step = cls._find_best_step(symbol, table=table, combinations=combinations)
+        print('step: ', step)
 
         if not isinstance(step[0], int):
             step = random.choice(random.choice(step))
@@ -13,7 +35,11 @@ class FindCellAI:
         return step
 
     @classmethod
-    def find_best_step(cls, symbol, table: list[tuple[Cell]], combinations: list[tuple[tuple]]):
+    def _find_best_step(cls,
+                        symbol,
+                        table: Sequence[List[Cell | None]],
+                        combinations: CombsType) -> Union[ListCombsType, CellIndex]:
+
         my_priority_steps = []
         enemy_win_cell = ()
 
