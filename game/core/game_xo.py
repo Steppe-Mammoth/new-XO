@@ -1,17 +1,13 @@
 from dataclasses import dataclass
 from enum import Enum
-from time import sleep
 from typing import NamedTuple, Optional, Tuple
 from abc import ABC, abstractmethod
 
-from game.core.AI import AIFindDefault
 from game.core.cheker import CheckerDefault, CheckerBase
-from game.core.players.player import Player, PlayerBase
+from game.core.players.player import PlayerBase
 from game.core.players.players import Players
-from game.core.symbol import Symbol
 from game.core.table.annotations import CombType
-from game.core.table.param import TableParam
-from game.core.table.table import TableDefault, TableBase
+from game.core.table.table import TableBase
 
 
 class ResultCode(Enum):
@@ -90,68 +86,3 @@ class Game(GameBase):
     def step_result(self, index_row: int, index_column: int, player: PlayerBase) -> ResultCode:
         self.step(index_row=index_row, index_column=index_column, player=player)
         return self.result(player=player)
-
-
-class GameConsole(Game):
-    def print_table(self):
-        print("i: ", end="")
-        print('   '.join(str(i) for i in range(len(self.table.table[0]))))
-        for index_row, row in enumerate(self.table.table):
-            print(index_row, end=": ")
-            for index_column, cell in enumerate(row):
-                print(cell.symbol.name if cell is not None else "*", end=" | ")
-            print('\n')
-
-    def print_result(self, result: ResultCode):
-        match result:
-            case ResultCode.WINNER:
-                r = self.result_game.value
-                print(f"WIN -> NAME: {r.player.name} | COMB: {r.combinations}")
-            case ResultCode.ALL_CELLS_USED:
-                print("PEACE: ALL USED CELLS")
-            case _:
-                print('OK. NEXT ...')
-
-    def step_result(self, index_row: int, index_column: int, player: PlayerBase) -> ResultCode:
-        result = super().step_result(index_row=index_row, index_column=index_column, player=player)
-        return result
-
-    def start_game(self):
-        result = ResultCode.NO_RESULT
-
-        print(f'Start Game')
-        while result is ResultCode.NO_RESULT:
-            p_now = self.players.now_player
-            self.print_table()
-            print(f'** STEP FOR: {p_now.name}')
-
-            if p_now.role == p_now.Role.ANDROID:
-                sleep(2)
-                i_r, i_c = AIFindDefault.get_best_step(symbol=p_now.symbol,
-                                                       table=self.table.table,
-                                                       combinations=self.table.combinations)
-            else:
-                i_r, i_c = map(int, input("Який ваш хід? (<index row> <index column>): ").split())
-
-            result = self.step_result(index_row=i_r, index_column=i_c, player=p_now)
-            self.print_result(result)
-
-            if result is ResultCode.NO_RESULT:
-                p_next = self.players.get_next_player()
-                self.players.set_now_player(p_next)
-
-        self.print_table()
-
-
-
-p1 = Player(name="1 ANDROID 1", symbol=Symbol('X', 1), role=Player.Role.ANDROID)
-p2 = Player(name="2 PLAYER 2", symbol=Symbol('O', 2), role=Player.Role.USER)
-# p3 = Player(name="3 ANDROID 3", symbol=Symbol('K', 3), role=Player.Role.ANDROID)
-# p4 = Player(name="4 ANDROID 4", symbol=Symbol('i', 4), role=Player.Role.ANDROID)
-
-p = Players(players=[p1, p2])
-
-t = TableDefault(param=TableParam(4, 4, 4))
-
-game = GameConsole(players=p, table=t)
-game.start_game()
