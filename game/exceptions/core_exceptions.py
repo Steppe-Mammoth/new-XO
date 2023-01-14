@@ -30,20 +30,13 @@ class TableIndexError(Exception):
 class TableParametersError(Exception):
     def __str__(self):
         return """
-        This parameters is not supported
-        
-        If ONLY_ALLOWED_TABLE_PARAMETERS = True:
-        - Send only parameters set in "AllowedTableParameter"
-        - Example: Table(AllowedTableParameter.DEFAULT)
-        
-        If ONLY_ALLOWED_TABLE_PARAMETERS = False:
-        - Create user parameter used "TableParam"
+        - Create user parameter used class "TableParam"
         """
 
 
 class SymbolError(Exception):
     def __str__(self):
         return """
-        Possible only field accessed in Symbol. 
-        - Example: Symbol.X'
+        Possible only Symbol objects. 
+        - Example: Symbol(name='X', value=1)
         """
