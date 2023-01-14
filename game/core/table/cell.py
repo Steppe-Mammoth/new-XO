@@ -1,6 +1,7 @@
 from abc import ABC
 
-from game.core.symbol import Symbol, SymbolError
+from game.core.symbol import Symbol
+from game.exceptions.core_exceptions import SymbolError
 
 
 class CellBase(ABC):
