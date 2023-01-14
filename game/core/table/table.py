@@ -11,7 +11,7 @@ from game.exceptions.core_exceptions import CellAlreadyUsedError, TableIndexErro
 
 
 def create_2d_list(row: int, column: int, default_obj: Any = None) -> Tuple[List[Any | None]]:
-    return tuple([default_obj for x in range(row)] for y in range(column))
+    return tuple([default_obj for _ in range(row)] for _ in range(column))
 
 
 class TableBase(ABC):
