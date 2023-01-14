@@ -1,23 +1,22 @@
-from game.core.symbol import Symbol
-from game.exceptions.core_exceptions import SymbolError
+from abc import ABC
+
+from game.core.symbol import Symbol, SymbolError
 
 
-class CellMeta:
-    def __new__(cls, symbol):
-        if not isinstance(symbol, Symbol):
-            raise SymbolError
-        return super().__new__(cls)
+class CellBase(ABC):
+    __slots__ = "_symbol",
 
-    def __deepcopy__(self, memo):
-        return self
-
-
-class Cell(CellMeta):
-    __slots__ = "__symbol",
-
-    def __init__(self, symbol: Symbol):
-        self.__symbol = symbol
+    def __init__(self, symbol):
+        self._symbol = symbol
 
     @property
-    def symbol(self) -> Symbol:
-        return self.__symbol
+    def symbol(self):
+        return self._symbol
+
+
+class Cell(CellBase):
+    def __init__(self, symbol: Symbol):
+        if not isinstance(symbol, Symbol):
+            raise SymbolError
+
+        super().__init__(symbol)
