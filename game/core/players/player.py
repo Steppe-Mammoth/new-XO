@@ -46,7 +46,5 @@ class Player(PlayerBase):
         super().__init__(name=name, symbol=symbol, role=role)
 
 
-
 p1 = Player(name='Igor1', symbol=Symbol('X', 1))
 p2 = Player(name='Igor1', symbol=Symbol('X', 1), role=Player.Role.ANDROID)
-
