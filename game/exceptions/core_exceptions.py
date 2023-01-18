@@ -1,20 +1,16 @@
-from game.core.symbol import Symbol
-from game.core.table.param import TableParam
-
-
 class CellAlreadyUsedError(Exception):
-    def __init__(self, used_cell: Symbol, new_cell: Symbol):
-        self.used_cell = used_cell
-        self.new_cell = new_cell
+    def __init__(self, used_symbol: str, new_symbol: str):
+        self.used_cell = used_symbol
+        self.new_cell = new_symbol
 
     def __str__(self):
         return f"""
-        THIS CELL IS USED. Cell symbol now = {self.used_cell.name}, you send = {self.new_cell.name}
+        THIS CELL IS USED. Cell symbol now = {self.used_cell}, you send = {self.new_cell}
         """
 
 
 class TableIndexError(Exception):
-    def __init__(self, index_column: int, index_row: int, table_param: TableParam):
+    def __init__(self, index_column, index_row, table_param):
         self.index_column = index_column
         self.index_row = index_row
         self.table_param = table_param
@@ -27,10 +23,17 @@ class TableIndexError(Exception):
         """
 
 
-class TableParametersError(Exception):
+class TableParamInstanceError(Exception):
     def __str__(self):
         return """
         - Create user parameter used class "TableParam"
+        """
+
+
+class TableInstanceError(Exception):
+    def __str__(self):
+        return """
+        Incorrect Table class object. Pass table object that are descendants of the TableBase class
         """
 
 
@@ -39,4 +42,47 @@ class SymbolError(Exception):
         return """
         Possible only Symbol objects. 
         - Example: Symbol(name='X', value=1)
+        """
+
+
+class PlayersIsEmptyError(Exception):
+    def __str__(self):
+        return """
+        The list of players is empty. Add players: Sequence[PlayerBase] first to start the game
+        """
+
+
+class BadRoleError(Exception):
+    def __str__(self):
+        return """
+        Incorrect player role. Pass the roles listed in the PlayerBase.Role class as an argument
+        - Example: PlayerBase.Role.User
+        """
+
+
+class PlayerInstanceError(Exception):
+    def __str__(self):
+        return """
+        Incorrect Player class object. Pass player that are descendants of the PlayerBase class
+        """
+
+
+class PlayersInstanceError(Exception):
+    def __str__(self):
+        return """
+        Incorrect Players class object. Pass players object that are descendants of the PlayersBase class
+        """
+
+
+class CheckerInstanceError(Exception):
+    def __str__(self):
+        return """
+        Incorrect Checker class object. Pass checker object that are descendants of the CheckerBase class
+        """
+
+
+class CombinationsInstanceError(Exception):
+    def __str__(self):
+        return """
+        Incorrect Combinations class object. Pass Combinations object that are descendants of the CombinationsBase class
         """
