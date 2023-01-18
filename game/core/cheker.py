@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from game.core.symbol import Symbol
 from game.core.table.annotations import CombType, CombsType
 from game.core.table.cell import Cell
+from game.exceptions.core_exceptions import CheckerInstanceError
 
 
 class CheckerBase(ABC):
@@ -40,3 +41,8 @@ class CheckerDefault(CheckerBase):
             if len(combination) == count_matches:
                 win_comb = combination  # ((0, 0), (0, 1), (0, 2))
                 return win_comb
+
+
+def check_checker_instance(checker: CheckerBase):
+    if not isinstance(checker, CheckerBase):
+        raise CheckerInstanceError
