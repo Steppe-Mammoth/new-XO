@@ -1,6 +1,13 @@
-class Symbol:
-    __slots__ = "name", "value"
+from game.exceptions.core_exceptions import SymbolError
 
-    def __init__(self, name: str, value: int):
+
+class Symbol:
+    __slots__ = "name"
+
+    def __init__(self, name: str):
         self.name = name
-        self.value = value
+
+
+def check_symbol(symbol):
+    if not isinstance(symbol, Symbol):
+        raise SymbolError
