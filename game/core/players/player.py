@@ -1,8 +1,9 @@
 from abc import ABC
 from enum import Enum
+from typing import Sequence
 
 from game.core.symbol import Symbol
-from game.exceptions.core_exceptions import SymbolError
+from game.exceptions.core_exceptions import SymbolError, PlayersIsEmptyError, BadRoleError, PlayerInstanceError
 
 
 class PlayerBase(ABC):
@@ -13,6 +14,11 @@ class PlayerBase(ABC):
     __slots__ = "name", "_symbol", "_count_steps", "_role"
 
     def __init__(self, name: str, symbol: Symbol, role: Role):
+        CheckPlayers.role(role=role)
+
+        if not isinstance(symbol, Symbol):
+            raise SymbolError
+
         self.name = name
         self._symbol = symbol
         self._count_steps = 0
@@ -38,13 +44,23 @@ class Player(PlayerBase):
     Role = PlayerBase.Role
 
     def __init__(self, name: str, symbol: Symbol, role: Role = Role.USER):
-        if not isinstance(symbol, Symbol):
-            raise SymbolError
-        if role not in self.Role:
-            raise AttributeError('Bad role')  # зробить виключення
-
         super().__init__(name=name, symbol=symbol, role=role)
 
 
-p1 = Player(name='Igor1', symbol=Symbol('X', 1))
-p2 = Player(name='Igor1', symbol=Symbol('X', 1), role=Player.Role.ANDROID)
+class CheckPlayers:
+    @classmethod
+    def role(cls, role: PlayerBase.Role):
+        if not type(role) is PlayerBase.Role or role not in PlayerBase.Role:
+            raise BadRoleError
+
+    @classmethod
+    def player_instance(cls, player: PlayerBase):
+        if not isinstance(player, PlayerBase):
+            raise PlayerInstanceError
+
+    @classmethod
+    def list_players(cls, players: Sequence[PlayerBase]):
+        if len(players) == 0:
+            raise PlayersIsEmptyError
+        for p in players:
+            cls.player_instance(p)
