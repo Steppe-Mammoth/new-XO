@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from functools import lru_cache
 
 from game.core.table.annotations import CombsType, CombType, CellIndex
+from game.exceptions.core_exceptions import CombinationsInstanceError
 from game.setting import SIZE_CACHE_COMBINATIONS
 
 
@@ -63,3 +64,8 @@ class CombDefault(CombinationsBase):
                 comb_vector.append(temp_index_cell)
 
             return tuple(comb_vector)
+
+
+def check_combinations_instance(comb: CombinationsBase):
+    if not isinstance(comb, CombinationsBase):
+        raise CombinationsInstanceError
