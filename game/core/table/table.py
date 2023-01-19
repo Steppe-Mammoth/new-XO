@@ -5,9 +5,9 @@ from game.core.table.combinations import CombDefault, CombinationsBase, check_co
 from game.core.table.annotations import CombsType
 from game.core.table.cell import Cell
 
-from game.core.symbol import Symbol
+from game.core.symbol import SymbolBase
 from game.core.table.param import TableParam, check_table_param_instance
-from game.exceptions.core_exceptions import CellAlreadyUsedError, TableIndexError, TableInstanceError
+from game.exceptions.core_exceptions import CellAlreadyUsedError, TableIndexError, TableInstanceError, AllCellsUsedError
 
 
 def create_2d_list(row: int, column: int, default_obj: Any = None) -> Tuple[List[Any | None]]:
@@ -22,28 +22,22 @@ class TableBase(ABC):
         check_table_param_instance(param)
         check_combinations_instance(combinations)
 
-        self._table = self._create_table(param=param)
         self._param = param
         self._count_free_cells: int = param.ROW * param.COLUMN
+        self._table = self.get_new_playing_field(param=param)
         self._combinations = combinations.get_combinations(size_row=param.ROW,
                                                            size_column=param.COLUMN,
                                                            size_combination=param.COMBINATION)
-
-    @abstractmethod
-    def set_symbol_cell(self, index_row: int, index_column: int, symbol: Symbol):
-        if self.count_free_cells > 0:
-            ...
-        self._remove_free_cell()
 
     @property
     def param(self) -> TableParam:
         return self._param
 
-    @property  # Перезначати, тим хто піклується про безпеку, бо повертаються змінюванні об'єкти
+    @property  # Reassign for those who care about security, because modifiable objects are returned.
     def table(self) -> Sequence[List[Cell | None]]:
         return self._table
 
-    @property  # Перезначати, тим хто піклується про безпеку, бо повертаються змінюванні об'єкти
+    @property  # Reassign for those who care about security, because modifiable objects are returned.
     def combinations(self) -> CombsType:
         return self._combinations
 
@@ -55,7 +49,17 @@ class TableBase(ABC):
         self._count_free_cells -= 1
 
     @abstractmethod
-    def _create_table(self, param: TableParam) -> Tuple[List[None]]:
+    def set_symbol_cell(self, index_row: int, index_column: int, symbol: SymbolBase):
+        """
+        Sets the transferred character in the specified cell by the row and column indices of the table \n
+        * Subtracts the number of free cells by -1 after successful installation.
+        """
+        ...
+        self._remove_free_cell()
+
+    @classmethod
+    @abstractmethod
+    def get_new_playing_field(cls, param: TableParam) -> Tuple[List[None]]:
         pass
 
 
@@ -64,9 +68,9 @@ class TableDefault(TableBase):
     def __init__(self, param: TableParam, combinations: CombinationsBase = CombDefault()):
         super().__init__(param, combinations=combinations)
 
-    def set_symbol_cell(self, index_row: int, index_column: int, symbol: Symbol):
+    def set_symbol_cell(self, index_row: int, index_column: int, symbol: SymbolBase):
         if self.count_free_cells == 0:
-            raise AttributeError('ALL USED CELLS')
+            raise AllCellsUsedError(game_table=self.table)
 
         param = self._param
         table = self._table
@@ -81,7 +85,7 @@ class TableDefault(TableBase):
         table[index_row][index_column] = Cell(symbol=symbol)
         self._remove_free_cell()
 
-    def _create_table(self, param: TableParam) -> Tuple[List[None]]:
+    def get_new_playing_field(self, param: TableParam) -> Tuple[List[None]]:
         return create_2d_list(row=param.ROW, column=param.COLUMN, default_obj=None)
 
 
