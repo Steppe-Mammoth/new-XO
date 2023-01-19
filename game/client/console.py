@@ -19,8 +19,8 @@ class GameConsole(Game):
 
     def get_step_for_player(self, player: PlayerBase) -> CellIndex:
         if player.role == player.Role.ANDROID:
-            step = self.ai.get_best_step(symbol=player.symbol,
-                                         table=self.table.table, combinations=self.table.combinations)
+            step = self.ai.get_step(symbol=player.symbol,
+                                    table=self.table.table, combinations=self.table.combinations)
         else:
             step = self._get_step_for_user()
         return step
@@ -70,7 +70,7 @@ class GameConsole(Game):
             case ResultCode.WINNER:
                 p = self.game_result.win_player
                 comb = self.game_result.win_combination
-                print(f"WIN: {p.name} < {p.symbol.name }> | COMB: < {comb} >")
+                print(f"WIN: {p.name} < {p.symbol.name } > | COMB: < {comb} >")
             case ResultCode.ALL_CELLS_USED:
                 print("PEACE: ALL USED CELLS")
 
@@ -79,7 +79,7 @@ class GameConsole(Game):
         print(f'Start Game | Enter < exit > to quit')
 
         while result is ResultCode.NO_RESULT:
-            p_now = self.players.now_player
+            p_now = self.players.current_player
             self.print_table()
             self.print_info_player(player=p_now)
 
@@ -99,7 +99,6 @@ class GameConsole(Game):
             self.print_result(result)
 
             if result is ResultCode.NO_RESULT:
-                p_next = self.players.get_next_player()
-                self.players.set_now_player(p_next)
+                self.players.set_next_player()
 
         self.print_table()
