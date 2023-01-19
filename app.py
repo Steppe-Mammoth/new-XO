@@ -1,7 +1,7 @@
 from game.client.console import GameConsole
 from game.core.players.player import Player
 from game.core.players.players import Players
-from game.core.symbol import Symbol
+from game.core.symbol import SymbolBase
 from game.core.table.param import TableParam
 from game.core.table.table import TableDefault
 
