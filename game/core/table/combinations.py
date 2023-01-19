@@ -1,4 +1,4 @@
-from enum import verify, UNIQUE, Enum
+from enum import Enum
 from abc import ABC, abstractmethod
 from functools import lru_cache
 
@@ -7,7 +7,6 @@ from game.exceptions.core_exceptions import CombinationsInstanceError
 from game.setting import SIZE_CACHE_COMBINATIONS
 
 
-@verify(UNIQUE)
 class Vectors(Enum):
     RIGHT = 'index_row, index_cell + temp_index'
     DOWN = 'index_row + temp_index, index_cell'
