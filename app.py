@@ -1,18 +1,13 @@
-from game.client.console import GameConsole
-from game.core.players.player import Player
-from game.core.players.players import Players
-from game.core.symbol import SymbolBase
-from game.core.table.param import TableParam
-from game.core.table.table import TableDefault
+from game import TableParam, TableDefault, GameConsole, Player, Players, SymbolBase
 
-p1 = Player(name="1 ANDROID 1", symbol=Symbol('X', 1), role=Player.Role.ANDROID)
-p2 = Player(name="2 PLAYER 2", symbol=Symbol('O', 2), role=Player.Role.USER)
-# p3 = Player(name="3 ANDROID 3", symbol=Symbol('K', 3), role=Player.Role.ANDROID)
-# p4 = Player(name="4 ANDROID 4", symbol=Symbol('i', 4), role=Player.Role.ANDROID)
+p1 = Player(name="ANDROID:1", symbol=SymbolBase('X'), role=Player.Role.ANDROID)
+p2 = Player(name="ANDROID:4", symbol=SymbolBase('I'), role=Player.Role.ANDROID)
+p3 = Player(name="ANDROID:3", symbol=SymbolBase('K'), role=Player.Role.ANDROID)
 
-p = Players(players=[p1, p2])
+p4 = Player(name="PLAYER:2", symbol=SymbolBase('O'), role=Player.Role.USER)
 
-t = TableDefault(param=TableParam(4, 4, 4))
+players = Players(players=[p1, p2, p3, p4])
+table = TableDefault(param=TableParam(5, 5, 4))
 
-game = GameConsole(players=p, table=t)
+game = GameConsole(players=players, table=table)
 game.start_game()
