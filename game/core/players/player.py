@@ -2,8 +2,8 @@ from abc import ABC
 from enum import Enum
 from typing import Sequence
 
-from game.core.symbol import Symbol
-from game.exceptions.core_exceptions import SymbolError, PlayersIsEmptyError, BadRoleError, PlayerInstanceError
+from game.core.symbol import SymbolBase, check_symbol
+from game.exceptions.core_exceptions import PlayersIsEmptyError, BadRoleError, PlayerInstanceError
 
 
 class PlayerBase(ABC):
@@ -13,11 +13,9 @@ class PlayerBase(ABC):
 
     __slots__ = "name", "_symbol", "_count_steps", "_role"
 
-    def __init__(self, name: str, symbol: Symbol, role: Role):
+    def __init__(self, name: str, symbol: SymbolBase, role: Role):
         CheckPlayers.role(role=role)
-
-        if not isinstance(symbol, Symbol):
-            raise SymbolError
+        check_symbol(symbol)
 
         self.name = name
         self._symbol = symbol
@@ -25,7 +23,7 @@ class PlayerBase(ABC):
         self._role = role
 
     @property
-    def symbol(self) -> Symbol:  # add test
+    def symbol(self) -> SymbolBase:  # add test
         return self._symbol
 
     @property
@@ -43,7 +41,7 @@ class PlayerBase(ABC):
 class Player(PlayerBase):
     Role = PlayerBase.Role
 
-    def __init__(self, name: str, symbol: Symbol, role: Role = Role.USER):
+    def __init__(self, name: str, symbol: SymbolBase, role: Role = Role.USER):
         super().__init__(name=name, symbol=symbol, role=role)
 
 
