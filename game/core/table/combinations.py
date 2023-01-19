@@ -20,7 +20,15 @@ class CombinationsBase(ABC):
     def get_combinations(self, size_row: int,
                          size_column: int,
                          size_combination: int) -> CombsType:
-        pass
+        """
+        For the passed arguments of the two-dimensional table, \n
+        it finds combinations that will be used to check the winnings for the player, or to find a move for the AI \n
+        :param size_row: The number of rows of a two-dimensional table.
+        :param size_column: The number of columns of a two-dimensional table.
+        :param size_combination: The amount cells filled in a row for a winning result.
+        :return: The array is defined in the CombsType annotation.
+        """
+        ...
 
 
 class CombDefault(CombinationsBase):

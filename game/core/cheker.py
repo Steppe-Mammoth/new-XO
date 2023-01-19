@@ -1,7 +1,7 @@
 from typing import List, Sequence, Optional
 from abc import ABC, abstractmethod
 
-from game.core.symbol import Symbol
+from game.core.symbol import SymbolBase
 from game.core.table.annotations import CombType, CombsType
 from game.core.table.cell import Cell
 from game.exceptions.core_exceptions import CheckerInstanceError
@@ -9,22 +9,21 @@ from game.exceptions.core_exceptions import CheckerInstanceError
 
 class CheckerBase(ABC):
     @abstractmethod
-    def result_player(self, symbol: Symbol,
+    def result_player(self, symbol: SymbolBase,
                       table: Sequence[List[Cell | None]],
                       combinations: CombsType) -> Optional[CombType]:
         """
-        :param symbol:
-        :param table:
-        :param combinations:
-        :return: ((index_row: int ,index_cell: int), ...) if Winner / else None.
+        The function checks in the given table for matches of the given symbol
+        in each combination in the combinations given by the argument.\n
+        If it exists – returns the winning combination for the transmitted symbol.
         """
-        pass
+        ...
 
 
 class CheckerDefault(CheckerBase):
 
     @classmethod
-    def result_player(cls, symbol: Symbol,
+    def result_player(cls, symbol: SymbolBase,
                       table: Sequence[List[Cell | None]],
                       combinations: CombsType) -> Optional[CombType]:
 

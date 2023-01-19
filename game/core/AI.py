@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import List, Sequence, NamedTuple
 
-from game.core.symbol import Symbol
+from game.core.symbol import SymbolBase
 from game.core.table.annotations import CellIndex, CombsType
 from game.core.table.cell import Cell
 
@@ -24,19 +24,24 @@ class AIResult(NamedTuple):
 
 class AIFindBase(ABC):
     @abstractmethod
-    def get_best_step(self,
-                      symbol: Symbol,
-                      table: Sequence[List[Cell | None]],
-                      combinations: CombsType) -> CellIndex:
-        pass
+    def get_step(self,
+                 symbol: SymbolBase,
+                 table: Sequence[List[Cell | None]],
+                 combinations: CombsType) -> CellIndex:
+        """
+        The function finds the best option for the AI step.\n
+        Returns a tuple of two elements, in which the first is the index of the row,
+        and the second is the index of the column of the two-dimensional table.
+        """
+        ...
 
 
 class AIFindDefault(AIFindBase):
     @classmethod
-    def get_best_step(cls,
-                      symbol: Symbol,
-                      table: Sequence[List[Cell | None]],
-                      combinations: CombsType) -> CellIndex:
+    def get_step(cls,
+                 symbol: SymbolBase,
+                 table: Sequence[List[Cell | None]],
+                 combinations: CombsType) -> CellIndex:
 
         cell_index = None
         result = cls._find_best_step(symbol, table=table, combinations=combinations)
