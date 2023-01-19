@@ -9,6 +9,18 @@ class CellAlreadyUsedError(Exception):
         """
 
 
+class AllCellsUsedError(Exception):
+    def __init__(self, game_table):
+        self.game_table = game_table
+
+    def __str__(self):
+        print_table = '\n'.join([str(row) for row in self.game_table])
+        return f"""
+        The table is completely filled, there are no free cells left
+        Result:{print_table}
+        """
+
+
 class TableIndexError(Exception):
     def __init__(self, index_column, index_row, table_param):
         self.index_column = index_column
