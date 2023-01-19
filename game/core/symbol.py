@@ -1,7 +1,7 @@
 from game.exceptions.core_exceptions import SymbolError
 
 
-class Symbol:
+class SymbolBase:
     __slots__ = "name"
 
     def __init__(self, name: str):
@@ -9,5 +9,5 @@ class Symbol:
 
 
 def check_symbol(symbol):
-    if not isinstance(symbol, Symbol):
+    if not isinstance(symbol, SymbolBase):
         raise SymbolError
