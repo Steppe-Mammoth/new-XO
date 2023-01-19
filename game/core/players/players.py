@@ -1,60 +1,77 @@
+import random
 from abc import ABC, abstractmethod
-from typing import Optional, Sequence, Generator
+from typing import MutableSequence
+from itertools import cycle
 
 from game.core.players.player import PlayerBase, CheckPlayers
 from game.exceptions.core_exceptions import PlayersInstanceError
 
 
 class PlayersBase(ABC):
-    __slots__ = '_players', '_now_player'
+    __slots__ = '_players', '_current_player'
 
-    def __init__(self, players: Sequence[PlayerBase]):
+    def __init__(self, players: MutableSequence[PlayerBase]):
         CheckPlayers.list_players(players=players)
 
         self._players = players
-        self._now_player: Optional[PlayerBase] = None
-
-    def set_now_player(self, player: PlayerBase):  # add test
-        CheckPlayers.player_instance(player=player)
-        self._now_player = player
+        self._current_player = None
 
     @property
     def players(self):
-        return self._players  # add test
+        return self._players
 
     @property
     @abstractmethod
-    def now_player(self) -> PlayerBase:
-        return self._now_player
+    def current_player(self) -> PlayerBase:
+        ...
 
     @abstractmethod
-    def get_next_player(self) -> PlayerBase:  # add test
-        pass
+    def shuffle_players(self):
+        """
+        Shuffles the list of players and replaces the queue
+        Sets the new current player from the updated queue as the current player \n
+        available via self.current_player method.
+        """
+        ...
+
+    @abstractmethod
+    def set_next_player(self) -> PlayerBase:
+        """
+        Replaces the current player with the next player in line and returns it. \n
+        New current player available via self.now_player
+        """
+        ...
 
 
 class Players(PlayersBase):
-    def __init__(self, players: Sequence[PlayerBase]):
+    def __init__(self, players: MutableSequence[PlayerBase]):
         super().__init__(players)
-
-        self._deque_players = None
+        self.__queue = None
 
     @property
-    def now_player(self) -> PlayerBase:
-        if not self._now_player:
-            super().set_now_player(self._players[0])
-        return self._now_player
+    def current_player(self) -> PlayerBase:
+        if not self._current_player:
+            self.set_next_player()
+        return self._current_player
 
-    def get_next_player(self) -> PlayerBase:
-        if not self._deque_players:
-            self._deque_players = self._deque_for_players()
-            self._deque_players.send(None)
+    def shuffle_players(self):
+        random.shuffle(self._players)
+        self.__queue = iter(self)
+        self.set_next_player()
 
-        return next(self._deque_players)
+    def set_next_player(self) -> PlayerBase:
+        return next(self)
 
-    def _deque_for_players(self) -> Generator:
-        while True:
-            for player in self._players:
-                yield player
+    def __iter__(self):
+        return cycle(self._players)
+
+    def __next__(self) -> PlayerBase:
+        if not self.__queue:
+            self.__queue = iter(self)
+
+        player = next(self.__queue)
+        self._current_player = player
+        return player
 
 
 def check_players_instance(players: PlayersBase):
