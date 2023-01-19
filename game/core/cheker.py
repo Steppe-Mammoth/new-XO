@@ -30,11 +30,10 @@ class CheckerDefault(CheckerBase):
         for combination in combinations:
             count_matches = 0
 
-            for step in combination:  # Для кожної комбінації в списку комбінацій, проходить по клітці комбінації
-                index_row, index_column = step
+            for index_row, index_column in combination:
                 cell = table[index_row][index_column]
 
-                if (cell is not None) and (cell.symbol == symbol):  # Якщо клітинка належить переданому символу
+                if (cell is not None) and (cell.symbol == symbol):  # cell has an identical symbol
                     count_matches += 1
 
             if len(combination) == count_matches:
