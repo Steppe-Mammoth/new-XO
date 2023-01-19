@@ -3,7 +3,7 @@ from typing import Optional
 from game.core.cheker import CheckerDefault, CheckerBase, check_checker_instance
 from game.core.players.player import PlayerBase
 from game.core.players.players import PlayersBase, check_players_instance
-from game.core.result import ResultCode, ResultBase, Result
+from game.core.result import ResultCode, GameStateBase, GameState
 from game.core.table.annotations import CombType
 from game.core.table.table import TableBase, check_table_instance
 
@@ -17,7 +17,8 @@ class GameBase:
         self._players = players
         self._table = table
         self._checker = checker
-        self._game_result = Result(code=ResultCode.NO_RESULT)
+        self._game_state: GameState = GameState(code=ResultCode.NO_RESULT)
+        """Game state. By default, it is indicated that the result is missing. changes as the game progresses"""
 
     @property
     def players(self):
@@ -28,18 +29,29 @@ class GameBase:
         return self._table
 
     @property
-    def game_result(self) -> ResultBase:
-        return self._game_result
+    def game_result(self) -> GameState:
+        return self._game_state
 
     def step(self, index_row: int, index_column: int, player: PlayerBase):
+        """
+        Places a player symbol on the playing field 'self.table'
+        """
         self.table.set_symbol_cell(index_row=index_row, index_column=index_column, symbol=player.symbol)
 
     def result(self, player: PlayerBase) -> ResultCode:
+        """
+        Function return object ResultCode for the player passed in the argument
+        If the ResultCode corresponds to the logical end of the game (for example,
+        ResultCode.WINNER, ResultCode.ALL_CELLS_USED),
+        then the function automatically changes the 'game_result' attribute,
+        adding final changes to it depending on the result of the game.
+        """
+
         if win_comb := self._player_result(player=player):
-            self._set_winner(player=player, win_combination=win_comb)
+            self.set_winner(player=player, win_combination=win_comb)
 
         elif self._table_result():
-            self._set_table_complete()
+            self.set_draw()
 
         return self.game_result.code
 
@@ -50,10 +62,23 @@ class GameBase:
         if self.table.count_free_cells == 0:
             return True
 
-    def _set_winner(self, player: PlayerBase, win_combination: CombType):
+    def set_winner(self, player: PlayerBase, win_combination: CombType):
+        """
+        Changes the self._game_state parameter to the result of the game in which there is a winner. \n
+        Changes: \n
+        * Replaces the result code \n
+        * Add a reference to the winning player object \n
+        * Add a player winning combination.
+        """
         self.game_result.update(code=ResultCode.WINNER, win_player=player, win_combination=win_combination)
 
-    def _set_table_complete(self):
+    def set_draw(self):
+        """
+        Changes the self._game_state parameter to the result of a game in which all cells are used and
+        there is no winner – i.e., a draw. \n
+        Changes: \n
+        * Replaces the result code.
+        """
         self.game_result.update(code=ResultCode.ALL_CELLS_USED)
 
 
@@ -73,5 +98,10 @@ class Game(GameBase):
         return result
 
     def step_result(self, index_row: int, index_column: int, player: PlayerBase) -> ResultCode:
+        """
+        Unifying function. Includes the following functions:\n
+        * def self.step
+        * def self.result
+        """
         self.step(index_row=index_row, index_column=index_column, player=player)
         return self.result(player=player)
