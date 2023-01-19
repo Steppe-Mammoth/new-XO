@@ -1,7 +1,7 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from enum import Enum
 
-from game.core.players.player import PlayerBase
+from game.core.players.player import PlayerBase, CheckPlayers
 from game.core.table.annotations import CombType
 
 
@@ -11,7 +11,7 @@ class ResultCode(Enum):
     WINNER = 2
 
 
-class ResultBase(ABC):
+class GameStateBase(ABC):
     __slots__ = "_code", "_win_player", "_win_combination"
 
     def __init__(self, code: ResultCode, win_player: PlayerBase = None, win_combination: CombType = None):
@@ -21,7 +21,6 @@ class ResultBase(ABC):
 
         self.update(code=code, win_player=win_player, win_combination=win_combination)
 
-    @abstractmethod
     def update(self, code: ResultCode = None, win_player: PlayerBase = None, win_combination: CombType = None):
         if code:
             self.code = code
@@ -44,14 +43,12 @@ class ResultBase(ABC):
 
     @code.setter
     def code(self, code: ResultCode):
-        if type(code) is not ResultCode:
-            raise AttributeError('Only ResultsCode object ')  # create raise
+        verified_result_code(code)
         self._code = code
 
     @win_player.setter
     def win_player(self, player: PlayerBase):
-        if not isinstance(player, PlayerBase):
-            raise AttributeError('PlayerBase only')  # create raise
+        CheckPlayers.player_instance(player)
         self._win_player = player
 
     @win_combination.setter
@@ -59,9 +56,10 @@ class ResultBase(ABC):
         self._win_combination = comb
 
 
-class Result(ResultBase):
-    def __init__(self, code: ResultCode, win_player: PlayerBase = None, win_combination: CombType = None):
-        super().__init__(code=code, win_player=win_player, win_combination=win_combination)
+class GameState(GameStateBase):
+    ...
 
-    def update(self, code: ResultCode = None, win_player: PlayerBase = None, win_combination: CombType = None):
-        super().update(code=code, win_player=win_player, win_combination=win_combination)
+
+def verified_result_code(code: ResultCode):
+    if not isinstance(code, ResultCode):
+        raise AttributeError('Only ResultsCode object ')  # create raise
