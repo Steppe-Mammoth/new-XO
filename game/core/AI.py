@@ -1,14 +1,15 @@
 import random
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import List, Sequence, NamedTuple
+from typing import Sequence, NamedTuple, Optional
 
 from game.core.symbol import SymbolBase
-from game.core.table.annotations import CellIndex, CombsType
+from game.core.table.annotations import CellIndex, CombsType, CombType
 from game.core.table.cell import Cell
 
 
-ListCombsType = List[List[CellIndex]]
+ListCombsType = list[list[CellIndex]]
+ResultCombs = CellIndex | CombType | ListCombsType
 
 
 class AIResultCode(Enum):
@@ -19,14 +20,14 @@ class AIResultCode(Enum):
 
 class AIResult(NamedTuple):
     result_code: AIResultCode
-    value: Sequence
+    value: ResultCombs
 
 
 class AIFindBase(ABC):
     @abstractmethod
     def get_step(self,
                  symbol: SymbolBase,
-                 table: Sequence[List[Cell | None]],
+                 table: Sequence[list[Cell | None]],
                  combinations: CombsType) -> CellIndex:
         """
         The function finds the best option for the AI step.\n
@@ -40,27 +41,29 @@ class AIFindDefault(AIFindBase):
     @classmethod
     def get_step(cls,
                  symbol: SymbolBase,
-                 table: Sequence[List[Cell | None]],
+                 table: Sequence[list[Cell | None]],
                  combinations: CombsType) -> CellIndex:
-
-        cell_index = None
+        cell_index: CellIndex
         result = cls._find_best_step(symbol, table=table, combinations=combinations)
 
         match result.result_code:
+
             case AIResultCode.BestCell:
                 cell_index = result.value
             case AIResultCode.BestCombs:
                 cell_index = random.choice(random.choice(result.value))
             case AIResultCode.EmptyCells:
                 cell_index = random.choice(result.value)
+            case _ as err:
+                raise ValueError(f'Find Error. Not supported value: {err}')
 
         return cell_index
 
     @classmethod
-    def _find_best_step(cls, symbol, table: Sequence[List[Cell | None]], combinations: CombsType) -> AIResult:
+    def _find_best_step(cls, symbol, table: Sequence[list[Cell | None]], combinations: CombsType) -> AIResult:
 
         result_code = None
-        value = None
+        value: Optional[ResultCombs] = None
 
         my_priority_steps = []
         enemy_win_cell = ()
@@ -110,13 +113,13 @@ class AIFindDefault(AIFindBase):
 
         elif enemy_win_cell:
             result_code = AIResultCode.BestCell
-            value = enemy_win_cell
+            value: CellIndex = enemy_win_cell
 
         elif my_priority_steps:
             result_code = AIResultCode.BestCombs
-            value = my_priority_steps
+            value: ListCombsType = my_priority_steps
         else:
             result_code = AIResultCode.EmptyCells
-            value = tuple(empty_cells)
+            value: CombType = tuple(empty_cells)
 
         return AIResult(result_code=result_code, value=value)
