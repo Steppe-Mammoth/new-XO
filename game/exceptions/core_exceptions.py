@@ -53,7 +53,7 @@ class SymbolError(Exception):
     def __str__(self):
         return """
         Possible only Symbol objects. 
-        - Example: Symbol(name='X', value=1)
+        - Example: Symbol(name='X')
         """
 
 

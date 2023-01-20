@@ -1,9 +1,11 @@
 from abc import ABC
 from enum import Enum
-from typing import Sequence
+from typing import Literal, TypeVar
 
-from game.core.symbol import SymbolBase, check_symbol
-from game.exceptions.core_exceptions import PlayersIsEmptyError, BadRoleError, PlayerInstanceError
+from game.core.symbol import SymbolBase, verify_symbol
+from game.exceptions.core_exceptions import BadRoleError, PlayerInstanceError
+
+PlayerT = TypeVar('PlayerT', bound='PlayerBase')
 
 
 class PlayerBase(ABC):
@@ -13,9 +15,9 @@ class PlayerBase(ABC):
 
     __slots__ = "name", "_symbol", "_count_steps", "_role"
 
-    def __init__(self, name: str, symbol: SymbolBase, role: Role):
-        CheckPlayers.role(role=role)
-        check_symbol(symbol)
+    def __init__(self, name: str, symbol: SymbolBase, role: Literal[Role.USER, Role.ANDROID]):
+        verify_role(role=role)
+        verify_symbol(symbol)
 
         self.name = name
         self._symbol = symbol
@@ -41,24 +43,15 @@ class PlayerBase(ABC):
 class Player(PlayerBase):
     Role = PlayerBase.Role
 
-    def __init__(self, name: str, symbol: SymbolBase, role: Role = Role.USER):
+    def __init__(self, name: str, symbol: SymbolBase, role=Role.USER):
         super().__init__(name=name, symbol=symbol, role=role)
 
 
-class CheckPlayers:
-    @classmethod
-    def role(cls, role: PlayerBase.Role):
-        if not type(role) is PlayerBase.Role or role not in PlayerBase.Role:
-            raise BadRoleError
+def verify_role(role: PlayerBase.Role):
+    if not type(role) is PlayerBase.Role or role not in PlayerBase.Role:
+        raise BadRoleError
 
-    @classmethod
-    def player_instance(cls, player: PlayerBase):
-        if not isinstance(player, PlayerBase):
-            raise PlayerInstanceError
 
-    @classmethod
-    def list_players(cls, players: Sequence[PlayerBase]):
-        if len(players) == 0:
-            raise PlayersIsEmptyError
-        for p in players:
-            cls.player_instance(p)
+def verify_player_instance(player: PlayerBase):
+    if not isinstance(player, PlayerBase):
+        raise PlayerInstanceError

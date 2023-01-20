@@ -1,6 +1,7 @@
 from enum import Enum
 from abc import ABC, abstractmethod
 from functools import lru_cache
+from typing import Optional
 
 from game.core.table.annotations import CombsType, CombType, CellIndex
 from game.exceptions.core_exceptions import CombinationsInstanceError
@@ -47,8 +48,7 @@ class CombDefault(CombinationsBase):
                     if comb:
                         combinations.append(comb)
 
-        combinations = tuple(combinations)
-        return combinations
+        return tuple(combinations)
 
     @classmethod
     def _get_combination_from_cell(cls,
@@ -56,15 +56,14 @@ class CombDefault(CombinationsBase):
                                    step: tuple[int, int],
                                    size_row: int,
                                    size_column: int,
-                                   size_combination: int) -> CombType:
-        comb_vector = []
-
+                                   size_combination: int) -> Optional[CombType]:
         index_row, index_cell = step  # args for eval
         temp_index = size_combination - 1  # arg for eval
-        expected_index_row, expected_index_column = eval(vector.value)  # Кінцеві індекси в векторі
+        expected_index_row, expected_index_column = eval(vector.value)  # The last expected indices in the given vector
 
-        # Якщо кінцеві індекси в допустимому діапазоні, то комбінація індексів (по вектору) заповнюється
+        # If the expected indices are within the acceptable range
         if (0 <= expected_index_row <= size_row - 1) and (0 <= expected_index_column <= size_column - 1):
+            comb_vector = []
 
             for temp_index in range(size_combination):
                 temp_index_cell: CellIndex = eval(vector.value)

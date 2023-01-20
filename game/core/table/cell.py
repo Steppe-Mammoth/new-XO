@@ -1,13 +1,13 @@
 from abc import ABC
 
-from game.core.symbol import SymbolBase, check_symbol
+from game.core.symbol import SymbolBase, verify_symbol
 
 
 class CellBase(ABC):
     __slots__ = "_symbol",
 
     def __init__(self, symbol: SymbolBase):
-        check_symbol(symbol)
+        verify_symbol(symbol)
         self._symbol = symbol
 
     @property
@@ -16,4 +16,4 @@ class CellBase(ABC):
 
 
 class Cell(CellBase):
-    pass
+    ...

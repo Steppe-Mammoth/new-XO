@@ -1,8 +1,9 @@
 import sys
+from abc import ABC, abstractmethod
 
 from game.core.AI import AIFindDefault, AIFindBase
 from game.core.game_xo import Game
-from game.core.result import ResultCode
+from game.core.result import ResultCode, GameStateT, GameState, GameStateBase
 from game.core.players.player import PlayerBase
 from prettytable import PrettyTable
 
@@ -12,15 +13,80 @@ from game.core.table.table import TableBase
 from game.exceptions.core_exceptions import CellAlreadyUsedError, TableIndexError
 
 
-class GameConsole(Game):
-    def __init__(self, players: PlayersBase, table: TableBase, ai: AIFindBase = AIFindDefault()):
-        super().__init__(players=players, table=table)
+class GameConsoleBase(Game, ABC):
+    def __init__(self, players: PlayersBase, table: TableBase, game_state: GameStateT, ai: AIFindBase):
+        super().__init__(players=players, table=table, game_state=game_state)
         self.ai = ai
 
-    def get_step_for_player(self, player: PlayerBase) -> CellIndex:
+    @abstractmethod
+    def get_step(self, player: PlayerBase) -> CellIndex:
+        """
+        A function to determine the player step\n
+        * For a player with a role.user requests a move in the console
+        * For a player with role.android, the move is calculated automatically
+        Returns the step index.
+        """
+        ...
+
+    @abstractmethod
+    def start_game(self) -> GameStateT:
+        """
+        Starts a loop that ends when the game ends \n
+        * For a player with a role.user requests a move in the console
+        * For a player with a role.android, the move is calculated automatically
+        * Prints the game table after each turn \n
+        Returns the final result of the game.
+        """
+        ...
+
+    @abstractmethod
+    def print_table(self):
+        ...
+
+
+class GameConsole(GameConsoleBase):
+    def __init__(self, players: PlayersBase,
+                 table: TableBase,
+                 game_state: GameStateT = GameState(),
+                 ai: AIFindBase = AIFindDefault(), ):
+
+        super().__init__(players=players, table=table, game_state=game_state, ai=ai)
+
+    @classmethod
+    def _print_step_info(cls, player: PlayerBase, index_row: int, index_column: int):
+        print(f'Step taken: {player.name} <{player.symbol.name}> | ↓: {index_row} | →: {index_column} |')
+
+    @classmethod
+    def _print_info_player(cls, player: PlayerBase):
+        p = player
+        print(f'Player: {p.name} < {p.symbol.name} > | Role: {p.role.name} | Count steps: {p.count_steps}')
+
+    @classmethod
+    def print_result(cls, result: GameStateBase):
+        text = None
+        match result.code:
+            case ResultCode.WINNER:
+                player = result.win_player
+                comb = result.win_combination
+                text = f"WIN: {player.name} < {player.symbol.name} > | COMB: < {comb} >"
+            case ResultCode.ALL_CELLS_USED:
+                text = "PEACE: ALL USED CELLS"
+        print(text)
+
+    def print_table(self):
+        table = PrettyTable()
+
+        table.field_names = ['↓/→'] + [str(i_column) for i_column in range(self.table.param.COLUMN)]
+        for i_row, row in enumerate(self.table.game_table):
+            cells_symbols = [cell.symbol.name if cell is not None else "*" for cell in row]
+            table.add_row([f"{i_row}:"] + cells_symbols)
+
+        print(table)
+
+    def get_step(self, player: PlayerBase) -> CellIndex:
         if player.role == player.Role.ANDROID:
             step = self.ai.get_step(symbol=player.symbol,
-                                    table=self.table.table, combinations=self.table.combinations)
+                                    table=self.table.game_table, combinations=self.table.combinations)
         else:
             step = self._get_step_for_user()
         return step
@@ -31,13 +97,13 @@ class GameConsole(Game):
             try:
                 step = self._input_step_player()
             except ValueError:  # make exception
-                print("* Non correct format: Please again\n"
+                print("ERROR: Non correct format: Please again\n"
                       "* Enter 2 integer: First for row ↓ index; Second for column → index")
         return step
 
     @classmethod
     def _input_step_player(cls) -> tuple[int]:
-        res = input("ENTER STEP: < ↓ > < → >: ")
+        res = input("ENTER STEP : < ↓ > < → >: ")
         if res == 'exit':
             sys.exit()
 
@@ -46,59 +112,31 @@ class GameConsole(Game):
             raise ValueError
         return step
 
-    @classmethod
-    def print_step_info(cls, player: PlayerBase, index_row: int, index_column: int):
-        print(f'Step taken: {player.name} <{player.symbol.name}> | ↓: {index_row} | →: {index_column}')
+    def start_game(self) -> GameStateT:
+        print(f'Start Game\n'
+              f'[Info: Expected two integers - e.g: < 0 2 > / Enter < exit > to quit]')
 
-    @classmethod
-    def print_info_player(cls, player: PlayerBase):
-        p = player
-        print(f'Player: {p.name} < {p.symbol.name} > | Role: {p.role.name} | Count steps: {p.count_steps}')
-
-    def print_table(self):
-        x = PrettyTable()
-
-        x.field_names = ['↓/→'] + [str(i_column) for i_column in range(self.table.param.COLUMN)]
-        for i_row, row in enumerate(self.table.table):
-            cells_symbols = [cell.symbol.name if cell is not None else "*" for cell in row]
-            x.add_row([f"{i_row}:"] + cells_symbols)
-
-        print(x)
-
-    def print_result(self, result: ResultCode):
-        match result:
-            case ResultCode.WINNER:
-                p = self.game_result.win_player
-                comb = self.game_result.win_combination
-                print(f"WIN: {p.name} < {p.symbol.name } > | COMB: < {comb} >")
-            case ResultCode.ALL_CELLS_USED:
-                print("PEACE: ALL USED CELLS")
-
-    def start_game(self):
-        result = ResultCode.NO_RESULT
-        print(f'Start Game | Enter < exit > to quit')
-
-        while result is ResultCode.NO_RESULT:
+        while self.game_state.code is ResultCode.NO_RESULT:
+            result = i_row = i_column = None
             p_now = self.players.current_player
-            self.print_table()
-            self.print_info_player(player=p_now)
 
-            result = None
-            i_row = i_column = None
+            self.print_table()
+            self._print_info_player(player=p_now)
 
             while result is None:
-                i_row, i_column = self.get_step_for_player(player=p_now)
+                i_row, i_column = self.get_step(player=p_now)
                 try:
                     result = self.step_result(index_row=i_row, index_column=i_column, player=p_now)
                 except CellAlreadyUsedError:
-                    print("This cell is used. Select another cell")
+                    print("ERROR: This cell is used. Select another cell")
                 except TableIndexError:
-                    print("This cell is not available, Select another cell")
+                    print("ERROR: This cell is not available, Select another cell")
 
-            self.print_step_info(player=p_now, index_row=i_row, index_column=i_column)
+            self._print_step_info(player=p_now, index_row=i_row, index_column=i_column)
             self.print_result(result)
 
-            if result is ResultCode.NO_RESULT:
+            if result.code is ResultCode.NO_RESULT:
                 self.players.set_next_player()
 
         self.print_table()
+        return self.game_state

@@ -17,6 +17,6 @@ class TableParam:
             raise ValueError("ROW and COLUMN size must not be less than COMBINATION")
 
 
-def check_table_param_instance(param: TableParam):
+def verify_table_param_instance(param: TableParam):
     if not isinstance(param, TableParam):
         raise TableParamInstanceError
