@@ -1,7 +1,7 @@
 import sys
 from abc import ABC, abstractmethod
 
-from game.core.AI import AIFindDefault, AIFindBase
+from game.core.ai import AIDefault, AIBase
 from game.core.game_xo import Game
 from game.core.result import ResultCode, GameStateT, GameState, GameStateBase
 from game.core.players.player import PlayerBase
@@ -14,7 +14,7 @@ from game.exceptions.core_exceptions import CellAlreadyUsedError, TableIndexErro
 
 
 class GameConsoleBase(Game, ABC):
-    def __init__(self, players: PlayersBase, table: TableBase, game_state: GameStateT, ai: AIFindBase):
+    def __init__(self, players: PlayersBase, table: TableBase, game_state: GameStateT, ai: AIBase):
         super().__init__(players=players, table=table, game_state=game_state)
         self.ai = ai
 
@@ -48,7 +48,7 @@ class GameConsole(GameConsoleBase):
     def __init__(self, players: PlayersBase,
                  table: TableBase,
                  game_state: GameStateT = GameState(),
-                 ai: AIFindBase = AIFindDefault(), ):
+                 ai: AIBase = AIDefault(), ):
 
         super().__init__(players=players, table=table, game_state=game_state, ai=ai)
 
@@ -59,16 +59,18 @@ class GameConsole(GameConsoleBase):
     @classmethod
     def _print_info_player(cls, player: PlayerBase):
         p = player
-        print(f'Player: {p.name} < {p.symbol.name} > | Role: {p.role.name} | Count steps: {p.count_steps}')
+        role = 'ANDROID' if p.is_android else 'USER'
+        print(f'Player: {p.name} < {p.symbol.name} > | Role: {role} | Count steps: {p.count_steps}')
 
     @classmethod
     def print_result(cls, result: GameStateBase):
         text = None
+
         match result.code:
             case ResultCode.WINNER:
                 player = result.win_player
-                comb = result.win_combination
-                text = f"WIN: {player.name} < {player.symbol.name} > | COMB: < {comb} >"
+                text = f"WIN: {player.name} < {player.symbol.name} > | COMB: < {result.win_combination} >"
+
             case ResultCode.ALL_CELLS_USED:
                 text = "PEACE: ALL USED CELLS"
         print(text)
@@ -77,16 +79,15 @@ class GameConsole(GameConsoleBase):
         table = PrettyTable()
 
         table.field_names = ['↓/→'] + [str(i_column) for i_column in range(self.table.param.COLUMN)]
-        for i_row, row in enumerate(self.table.game_table):
+        for i_row, row in enumerate(self.table.game_field):
             cells_symbols = [cell.symbol.name if cell is not None else "*" for cell in row]
             table.add_row([f"{i_row}:"] + cells_symbols)
 
         print(table)
 
     def get_step(self, player: PlayerBase) -> CellIndex:
-        if player.role == player.Role.ANDROID:
-            step = self.ai.get_step(symbol=player.symbol,
-                                    table=self.table.game_table, combinations=self.table.combinations)
+        if player.is_android:
+            step = self.ai_get_step(player=player)
         else:
             step = self._get_step_for_user()
         return step
@@ -136,7 +137,7 @@ class GameConsole(GameConsoleBase):
             self.print_result(result)
 
             if result.code is ResultCode.NO_RESULT:
-                self.players.set_next_player()
+                self.players.set_get_next_player()
 
         self.print_table()
         return self.game_state
