@@ -6,5 +6,3 @@ from .core.symbol import Symbol
 from .core.table.table import TableDefault, TableParam
 from .core.table.cell import Cell
 from .core.game_xo import ResultCode, GameState, Game
-
-from .client.console import GameConsole
