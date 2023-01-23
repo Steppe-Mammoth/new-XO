@@ -66,40 +66,78 @@ table = TableDefault(param=TableParam(ROW=3, COLUMN=3, COMBINATION=3))
 # COMBINATION - кількість клітинок яких потрібно зайняти підряд одним символом для виграшгу
 
 game = Game(players=players, table=table)
++-----+---+---+---+
+| ↓/→ | 0 | 1 | 2 |
++-----+---+---+---+
+|  0: | * | * | * |
+|  1: | * | * | * |
+|  2: | * | * | * |
++-----+---+---+---+
 ```
 
-Метод game.step:
+#### Метод game.step:
 ```python
-def step(self, index_row: int, index_column: int, player: PlayerBase):
+def step(self, index_row: int, index_column: int, player: PlayerBase)
 ```
+```python
+game.step(index_row=1, index_column=0, player=p2)  # my first step
++-----+---+---+---+
+| ↓/→ | 0 | 1 | 2 |
++-----+---+---+---+
+|  0: | * | * | * |
+|  1: | O | * | * |
+|  2: | * | * | * |
++-----+---+---+---+
+```
+Фукція яка встановлює символ гравця `player.symbol` в клітинку за вказаними індексами.  
+Після успішного встановлення лічильник `player.count_steps` збільшується на +1, а `game.table.count_free_cells` зменшується на -1
 
+Примітка:
+* _Якщо передані індекси не збігаються з можливими в таблиці - помилка_ `TableIndexError`
+* _Якщо ви намагаєтесь встановити новий символ на вже зайняту клітинку - помилка_ `CellAlreadyUsedError`
 
-Метод game.result
+#### Метод game.result:
 ```python
 GameStateT = TypeVar('GameStateT', bound=GameStateBase, covariant=True)
 
-def result(self, player: PlayerBase) -> GameStateT:
+def result(self, player: PlayerBase) -> GameStateT
 ```
+```python
+res = game.result(player=p2)
+res.is_finished  # False
+```
+Для заданого гравця (його символа) функція проводить перевірку на виграш в гральній таблиці.  
+Перевірка здійснюється по заданим комбінаціям які доступні в `game.table.combinations` 
 
-Метод game.step_result
+Якщо виграш відсутній, проводиться перевірка на вільні клітинки.  
+Коли одна з двух вірогідностей дійсна, автоматично викликається метод `game_state.update` який модифікує: `game.game_state`, змінюючи вньому статус `.code`, а в випадку коли гравець виграв - щей доповнює поля: `.win_player` і `.win_combination`
+
+Пілся перевірок та можливих модифікацій - повертає об'єкт: `game_state`
+
+Примітка: 
+* _Комбінації створюються автоматично за параметрами таблиці, або передаються врчуну коли конструюється екземпляр класу Table_
+* _Щоб дізнатися що одна з тригерів які логічно завершуює гру спрацювала - можно викликавши в поверненому результаті або через екземпляр гри метод: `game_state.is_finished`, якщо False - продовжуємо грати_
+_Про GameState - далі. Тут коротко_
+
+#### Метод game.step_result:
 ```python
 
-def step_result(self, index_row: int, index_column: int, player: PlayerBase) -> GameStateT:
+def step_result(self, index_row: int, index_column: int, player: PlayerBase) -> GameStateT
 ```
 
-Метод game.ai_get_step
+#### Метод game.ai_get_step:
 ```python
-def ai_get_step(self, player: PlayerBase) -> CellIndex:
+def ai_get_step(self, player: PlayerBase) -> CellIndex
 ```
 
-Метод game.ai_step
+#### Метод game.ai_step:
 ```python
-def ai_step(self, player: PlayerBase):
+def ai_step(self, player: PlayerBase)
 ```
 
-Метод game.ai_step_result
+#### Метод game.ai_step_result:
 ```python
-def ai_step_result(self, player: PlayerBase) -> GameStateT:
+def ai_step_result(self, player: PlayerBase) -> GameStateT
 ```
 
 ### TABLE
