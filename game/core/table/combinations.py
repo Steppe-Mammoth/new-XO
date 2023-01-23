@@ -4,7 +4,7 @@ from functools import lru_cache
 from typing import Optional
 
 from game.core.table.annotations import CombsType, CombType, CellIndex
-from game.exceptions.core_exceptions import CombinationsInstanceError
+from game.exceptions.core_exceptions import ListCombinationsError
 from game.setting import SIZE_CACHE_COMBINATIONS
 
 
@@ -15,7 +15,7 @@ class Vectors(Enum):
     DOWN_LEFT = 'index_row + temp_index, index_cell - temp_index'
 
 
-class CombinationsBase(ABC):
+class CombBase(ABC):
     @abstractmethod
     def get_combinations(self, size_row: int,
                          size_column: int,
@@ -31,7 +31,7 @@ class CombinationsBase(ABC):
         ...
 
 
-class CombDefault(CombinationsBase):
+class CombDefault(CombBase):
     @classmethod
     @lru_cache(maxsize=SIZE_CACHE_COMBINATIONS)
     def get_combinations(cls, size_row: int, size_column: int, size_combination: int) -> CombsType:
@@ -72,6 +72,11 @@ class CombDefault(CombinationsBase):
             return tuple(comb_vector)
 
 
-def check_combinations_instance(comb: CombinationsBase):
-    if not isinstance(comb, CombinationsBase):
-        raise CombinationsInstanceError
+def verify_combs_list(combs_list: CombsType):
+    try:
+        for comb in combs_list:
+            for cell_index in comb:
+                if not (len(cell_index) == 2 and isinstance(cell_index[0], int) and isinstance(cell_index[1], int)):
+                    raise ListCombinationsError(combs_list=combs_list)
+    except TypeError:
+        raise ListCombinationsError(combs_list=combs_list)
