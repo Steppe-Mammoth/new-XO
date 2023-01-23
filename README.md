@@ -9,10 +9,10 @@
 
 ## Знайомство з біблеотекою
 ### Старт швидкої гри в консолі
-_В нас є можливість створити ігрову таблицю будь-якого розміру, та з будь-якою кількістю гравців._  
+_Ми можемо задати будь-який розмір для ігрової таблиці та безліч гравців для гри_ 
 - _AI і перелік виграшних комбінації для гравців підлаштуються автоматично_
 
-_Скористаємося цим. **Тому замість класичної таблиці 3х3 - створимо 6х6 на 3 гравця**  
+_Скористаємося цим. **Замість класичної таблиці 3х3 - створимо 7х7, та 3 гравця**  
 Цього разу боти хай грають один з одним. Поглянемо на це_
 
 ```python
@@ -27,32 +27,75 @@ if __name__ == "__main__":
     # p4 = Player(name="PLAYER", symbol=Symbol('P'), role=Player.Role.USER)  # Якщо без вас ніяк
 
     players = Players(players=[p1, p2, p3])
-    table = TableDefault(param=TableParam(ROW=6, COLUMN=6, COMBINATION=6))
+    table = TableDefault(param=TableParam(ROW=7, COLUMN=7, COMBINATION=5))
     # COMBINATION - кількість клітинок яких потрібно зайняти підряд одним символом для виграшгу
 
     game_console = GameConsole(players=players, table=table)
     game_console.start_game()
 ```
-Метод `.start_game` активує цикл while з умовою виходу, якщо гра буде логічно закінчено (Є виграш / Всі клітинки зайняті == `game_console.game_state.is_finished`)
-
-Примітка:
-* Для гравців в черзі, які повертають True для методу `player.is_android` застосовуюється автоматичний пошук клітинки, а для гравців які повернуть True для `player.is_user` буде запропоновано вести індекси в консолі
 
 <details>
   <summary>Attempt #1</summary>
   
-![Image alt](images/win_10_10.png)
+```python
+WIN: ANDROID:1 < X > | COMB: < ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5)) >
++-----+---+---+---+---+---+---+---+
+| ↓/→ | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
++-----+---+---+---+---+---+---+---+
+|  0: | O | * | * | * | K | X | K |
+|  1: | K | X | * | * | O | * | X |
+|  2: | X | K | X | O | K | O | X |
+|  3: | K | O | K | X | X | K | O |
+|  4: | K | O | X | X | X | O | X |
+|  5: | O | O | K | O | O | X | X |
+|  6: | * | * | O | K | * | K | K |
++-----+---+---+---+---+---+---+---+
+```
 </details>
 
 <details>
   <summary>Attempt #2</summary>
   
-![Image alt](images/peace_10_10.png)
+```python
+PEACE: ALL USED CELLS
++-----+---+---+---+---+---+---+---+
+| ↓/→ | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
++-----+---+---+---+---+---+---+---+
+|  0: | X | K | K | O | O | O | X |
+|  1: | K | X | X | K | X | O | K |
+|  2: | X | K | O | O | O | X | K |
+|  3: | O | X | K | K | O | K | X |
+|  4: | X | O | K | O | O | X | O |
+|  5: | X | X | O | X | X | K | K |
+|  6: | K | K | X | O | K | O | X |
++-----+---+---+---+---+---+---+---+
+```
 </details>
 
-+ Цей шаблон для швидкої консольної гри знаходиться в app.py, можете запустити його в github codespace  
-___Як захочете нагрузити процесор сотнею ботів в 1000х1000 полі - ніхто не завадить!___
+<details>
+  <summary>Attempt #3</summary>
+  
+```python
+WIN: ANDROID:4 < O > | COMB: < ((3, 1), (3, 2), (3, 3), (3, 4), (3, 5)) >
++-----+---+---+---+---+---+---+---+
+| ↓/→ | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
++-----+---+---+---+---+---+---+---+
+|  0: | * | * | * | * | K | * | * |
+|  1: | * | * | * | * | K | * | * |
+|  2: | * | X | * | * | * | * | * |
+|  3: | * | O | O | O | O | O | X |
+|  4: | * | * | * | * | K | * | * |
+|  5: | * | * | * | * | * | * | * |
+|  6: | K | X | X | X | O | X | K |
++-----+---+---+---+---+---+---+---+
+```
+</details>
 
+Метод `.start_game` активує цикл while з умовою виходу, якщо гра буде логічно закінчено (Є виграш / Всі клітинки зайняті == `game_console.game_state.is_finished`)
+
+* Для гравців в черзі, які повертають True для методу `player.is_android` застосовуюється автоматичний пошук клітинки, а для гравців які повернуть True для `player.is_user` буде запропоновано вести індекси в консолі
+
+___Як захочете нагрузити процесор сотнею ботів в 1000х1000 полі - ніхто не завадить!___
 _Підемо далі_
 
 # API
@@ -110,13 +153,14 @@ def result(self, player: PlayerBase) -> GameStateT
 ```
 ```python
 res = game.result(player=p2)
-
-assert res == game.game_state
+```
+```python
 res.is_finished  # False
+assert res == game.game_state  # True
 ```
 Для заданого гравця (його символа) функція проводить 2 перевірки
-* * Пошуку виграшу, де здійснюється перевірка по комбінаціям які доступні в `game.table.combinations`
-* * Перевірка на нічию. Порівнюється значення результату `game.table.count_free_cells`
+* _Пошуку виграшу, де здійснюється перевірка по комбінаціям які доступні в `game.table.combinations`_
+* _Перевірка на нічию. Порівнюється значення результату `game.table.count_free_cells`_
   
 Коли одна з двух вірогідностей дійсна, автоматично викликається метод `game_state.update`, який модифікує: `game_state`, змінюючи вньому статус `.code`, а в випадку коли гравець виграв - щей доповнює поля: `.win_player` і `.win_combination`
 
@@ -129,22 +173,28 @@ res.is_finished  # False
 ```python
 def step_result(self, index_row: int, index_column: int, player: PlayerBase) -> GameStateT
 ```
+...
 
 
 #### Метод game.ai_get_step:
 ```python
 def ai_get_step(self, player: PlayerBase) -> CellIndex
 ```
+...
+
 
 #### Метод game.ai_step:
 ```python
 def ai_step(self, player: PlayerBase)
 ```
+...
+
 
 #### Метод game.ai_step_result:
 ```python
 def ai_step_result(self, player: PlayerBase) -> GameStateT
 ```
+...
 
 ### TABLE
 
