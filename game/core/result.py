@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Optional, TypeVar, Generic
+from typing import Optional, TypeVar
 
 from game.core.players.player import PlayerBase, verify_player_instance
 from game.core.table.annotations import CombType
+from game.exceptions.core_exceptions import ResultCodeError
 
-GameStateT = TypeVar('GameStateT', bound='GameStateBase')
+GameStateT = TypeVar('GameStateT', bound='GameStateBase', covariant=True)
 
 
 class ResultCode(Enum):
@@ -15,8 +16,6 @@ class ResultCode(Enum):
 
 
 class GameStateBase(ABC):
-    __slots__ = "_code", "_win_player", "_win_combination"
-
     def __init__(self):
         self._code: ResultCode = ResultCode.NO_RESULT
         self._win_player: Optional[PlayerBase] = None
@@ -34,6 +33,16 @@ class GameStateBase(ABC):
     def win_combination(self) -> Optional[CombType]:
         return self._win_combination
 
+    @property
+    @abstractmethod
+    def is_finished(self) -> bool:
+        ...
+
+    @property
+    @abstractmethod
+    def is_continues(self) -> bool:
+        ...
+
     @abstractmethod
     def update(self,
                code: Optional[ResultCode] = None,
@@ -43,6 +52,16 @@ class GameStateBase(ABC):
 
 
 class GameState(GameStateBase):
+    __slots__ = "_code", "_win_player", "_win_combination"
+
+    @property
+    def is_finished(self) -> bool:
+        return self._code != ResultCode.NO_RESULT
+
+    @property
+    def is_continues(self) -> bool:
+        return self._code == ResultCode.NO_RESULT
+
     def update(self,
                code: Optional[ResultCode] = None,
                win_player: Optional[PlayerBase] = None,
@@ -62,4 +81,4 @@ class GameState(GameStateBase):
 
 def verified_result_code(code: ResultCode):
     if not isinstance(code, ResultCode):
-        raise AttributeError('Only ResultsCode object ')  # create raise
+        raise ResultCodeError('Only ResultsCode object ')  # create raise
