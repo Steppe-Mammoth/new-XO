@@ -4,10 +4,7 @@ from game.core.symbol import SymbolBase, verify_symbol
 
 
 class CellBase(ABC):
-    __slots__ = "_symbol",
-
     def __init__(self, symbol: SymbolBase):
-        verify_symbol(symbol)
         self._symbol = symbol
 
     @property
@@ -16,4 +13,8 @@ class CellBase(ABC):
 
 
 class Cell(CellBase):
-    ...
+    __slots__ = "_symbol",
+
+    def __init__(self, symbol: SymbolBase):
+        verify_symbol(symbol)
+        super().__init__(symbol)
