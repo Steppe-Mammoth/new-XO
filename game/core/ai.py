@@ -23,7 +23,7 @@ class AIResult(NamedTuple):
     value: ResultCombs
 
 
-class AIFindBase(ABC):
+class AIBase(ABC):
     @abstractmethod
     def get_step(self,
                  symbol: SymbolBase,
@@ -37,7 +37,7 @@ class AIFindBase(ABC):
         ...
 
 
-class AIFindDefault(AIFindBase):
+class AIDefault(AIBase):
     @classmethod
     def get_step(cls,
                  symbol: SymbolBase,

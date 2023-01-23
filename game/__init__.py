@@ -1,4 +1,4 @@
-from .core.AI import AIFindDefault
+from .core.ai import AIDefault
 from .core.cheker import CheckerDefault
 from .core.players.player import Player
 from .core.players.players import Players
