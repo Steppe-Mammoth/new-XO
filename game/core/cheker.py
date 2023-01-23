@@ -1,10 +1,10 @@
-from typing import Sequence, Optional
+from typing import Sequence, Optional, Type
 from abc import ABC, abstractmethod
 
 from game.core.symbol import SymbolBase
 from game.core.table.annotations import CombType, CombsType
 from game.core.table.cell import Cell
-from game.exceptions.core_exceptions import CheckerInstanceError
+from game.exceptions.core_exceptions import CheckerError
 
 
 class CheckerBase(ABC):
@@ -43,6 +43,8 @@ class CheckerDefault(CheckerBase):
                 return win_comb
 
 
-def check_checker_instance(checker: CheckerBase):
-    if not isinstance(checker, CheckerBase):
-        raise CheckerInstanceError
+def verify_checker_instance(checker: Type[CheckerBase] | CheckerBase):
+    if not any(((
+            isinstance(checker, type) and issubclass(checker, CheckerBase) and checker != CheckerBase),
+            isinstance(checker, CheckerBase))):
+        raise CheckerError
