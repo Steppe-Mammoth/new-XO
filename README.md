@@ -147,8 +147,6 @@ game.step(index_row=1, index_column=0, player=p2)  # my first step
 
 #### Метод game.result:
 ```python
-GameStateT = TypeVar('GameStateT', bound=GameStateBase, covariant=True)
-
 def result(self, player: PlayerBase) -> GameStateT
 ```
 ```python
@@ -173,36 +171,84 @@ assert res == game.game_state  # True
 ```python
 def step_result(self, index_row: int, index_column: int, player: PlayerBase) -> GameStateT
 ```
-...
+Об'єднувальний метод. Замніняє почерговий виклик  `game.step` і `game.result`
 
 
 #### Метод game.ai_get_step:
 ```python
 def ai_get_step(self, player: PlayerBase) -> CellIndex
 ```
-...
+Для вказаного гравця, знаходить найкращу клітинку для ходу.  
+Повертає кортеж з двома елементами (`index_row: int, index_column: int`)
 
 
 #### Метод game.ai_step:
 ```python
 def ai_step(self, player: PlayerBase)
 ```
-...
-
+Об'єднувальний метод. Замніняє почерговий виклик  `game.ai_get_step` і `game.step`
 
 #### Метод game.ai_step_result:
 ```python
 def ai_step_result(self, player: PlayerBase) -> GameStateT
 ```
+Об'єднувальний метод. Замніняє почерговий виклик  `game.ai_get_step` і `game.step_result` повертаючи результат останього
 ...
 
 ### TABLE
 
+* _Комбінації створюються автоматично за параметрами таблиці, або передаються врчуну коли конструюється екземпляр класу Table_
+...
+
 ### PLAYERS
+...
 
 ### PLAYER
+...
 
 ### GAME STATE
 ...
 
-* _Комбінації створюються автоматично за параметрами таблиці, або передаються врчуну коли конструюється екземпляр класу Table_
+### AI
+
+Короткий приклад роботи:
+```python
+p1 = Player(name="PLAYER", symbol=Symbol('X'))
+p2 = Player(name="ANDROID", symbol=Symbol('O'))
+...
+```
+```python
+game.step(2, 2, player=p1)
+game.step(0, 0, player=p1)
+
+game.ai_step(p2)  # result in second table
+
++-----+---+---+---+   ->   +-----+---+---+---+
+| ↓/→ | 0 | 1 | 2 |   ->   | ↓/→ | 0 | 1 | 2 |
++-----+---+---+---+   ->   +-----+---+---+---+
+|  0: | X | * | * |   ->   |  0: | X | * | * |
+|  1: | * | * | * |   ->   |  1: | * | O | * |
+|  2: | * | * | X |   ->   |  2: | * | * | X |
++-----+---+---+---+   ->   +-----+---+---+---+
+```
+* AI алгоритм розуміє, що наступний хід для суперника буде виграшний, тому перекриває його
+
+Розглянемо другу ситуацію
+```python
+game.step(0, 0, player=p1)  # X
+game.step(2, 0, player=p1)  # X
+
+game.step(0, 2, player=p2)  # O
+game.step(2, 2, player=p2)  # O
+
+game.ai_step(p2)  # result in second table
+
++-----+---+---+---+   ->   +-----+---+---+---+
+| ↓/→ | 0 | 1 | 2 |   ->   | ↓/→ | 0 | 1 | 2 |
++-----+---+---+---+   ->   +-----+---+---+---+
+|  0: | X | * | O |   ->   |  0: | X | * | O |
+|  1: | * | * | * |   ->   |  1: | * | * | O |
+|  2: | X | * | O |   ->   |  2: | X | * | O |
++-----+---+---+---+   ->   +-----+---+---+---+
+```
+* AI алгоритм ставить в пріоритет свій виграш, розуміючи що наступного ходу для суперника вже не буде
