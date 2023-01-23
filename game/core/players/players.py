@@ -1,20 +1,18 @@
 import random
 from abc import ABC, abstractmethod
-from typing import MutableSequence, Sequence
+from copy import copy
+from typing import MutableSequence, Sequence, TypeVar
 from itertools import cycle
 
 from game.core.players.player import PlayerBase, verify_player_instance, PlayerT
 from game.exceptions.core_exceptions import PlayersInstanceError, PlayersIsEmptyError
 
+PlayersT = TypeVar('PlayersT', bound='PlayersBase', covariant=True)
+
 
 class PlayersBase(ABC):
-    __slots__ = '_player_list', '_current_player'
-
     def __init__(self, players: MutableSequence[PlayerT]):
-        verify_player_list(players=players)
-
         self._player_list = players
-        self._current_player = None
 
     @property
     def player_list(self):
@@ -26,6 +24,13 @@ class PlayersBase(ABC):
         ...
 
     @abstractmethod
+    def set_get_next_player(self) -> PlayerT:
+        """
+        Replaces the current player with the next player in line and returns it. \n
+        New current player available via self.current_player
+        """
+        ...
+
     def shuffle_players(self):
         """
         Shuffles the list of players and replaces the queue
@@ -34,33 +39,30 @@ class PlayersBase(ABC):
         """
         ...
 
-    @abstractmethod
-    def set_next_player(self) -> PlayerT:
-        """
-        Replaces the current player with the next player in line and returns it. \n
-        New current player available via self.now_player
-        """
-        ...
-
 
 class Players(PlayersBase):
+    __slots__ = '_player_list', '_current_player'
+
     def __init__(self, players: MutableSequence[PlayerT]):
-        super().__init__(players)
+        verify_player_list(players=players)
+        super().__init__(copy(players))
+
+        self._current_player = None
         self.__queue = None
 
-    @property
-    def current_player(self) -> PlayerT:
-        if not self._current_player:
-            self.set_next_player()
-        return self._current_player
+    def set_get_next_player(self) -> PlayerT:
+        return next(self)
 
     def shuffle_players(self):
         random.shuffle(self._player_list)
         self.__queue = iter(self)
-        self.set_next_player()
+        self.set_get_next_player()
 
-    def set_next_player(self) -> PlayerT:
-        return next(self)
+    @property
+    def current_player(self) -> PlayerT:
+        if not self._current_player:
+            self.set_get_next_player()
+        return self._current_player
 
     def __iter__(self):
         return cycle(self._player_list)
