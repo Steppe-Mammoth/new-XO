@@ -43,6 +43,16 @@ class GameStateBase(ABC):
     def is_continues(self) -> bool:
         ...
 
+    @property
+    @abstractmethod
+    def is_winner(self) -> bool:
+        ...
+
+    @property
+    @abstractmethod
+    def is_draw(self) -> bool:
+        ...
+
     @abstractmethod
     def update(self,
                code: Optional[ResultCode] = None,
@@ -61,6 +71,14 @@ class GameState(GameStateBase):
     @property
     def is_continues(self) -> bool:
         return self._code == ResultCode.NO_RESULT
+
+    @property
+    def is_winner(self) -> bool:
+        return self._code == ResultCode.WINNER
+
+    @property
+    def is_draw(self) -> bool:
+        return self._code == ResultCode.ALL_CELLS_USED
 
     def update(self,
                code: Optional[ResultCode] = None,
