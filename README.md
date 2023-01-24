@@ -28,10 +28,10 @@ if __name__ == "__main__":
     # p4 = Player(name="PLAYER", symbol=Symbol('P'), role=Player.Role.USER)  # Якщо без вас ніяк
 
     players = Players(players=[p1, p2, p3])
-    table = TableDefault(param=TableParam(ROW=7, COLUMN=7, COMBINATION=5))
+    game_table = TableDefault(param=TableParam(ROW=7, COLUMN=7, COMBINATION=5))
     # COMBINATION - кількість клітинок яких потрібно зайняти підряд одним символом для виграшгу
 
-    game_console = GameConsole(players=players, table=table)
+    game_console = GameConsole(players=players, table=game_table)
     game_console.start_game()
 ```
 
@@ -156,7 +156,7 @@ game.step(index_row=1, index_column=1, player=p2)
 ```python
 def result(self, player: PlayerBase) -> GameStateT
 ```
-Продовжимо, перевіримо результат наших попередніх 3-ох кроків, очікуємо виграш
+Перевіримо результат наших попередніх 3-ох кроків, очікуємо виграш
 ```python
 res = game.result(player=p2)
     
@@ -212,10 +212,37 @@ def ai_step_result(self, player: PlayerBase) -> GameStateT
 ```
 * **Об'єднувальний метод**. Заміняє почерговий виклик  `game.ai_get_step` і `game.step_result`, повертає результат останього
 
-### TABLE
+### TABLE 
+```python
+table = game.table
+```   
+    
+#### Метод table.combinations:    
 
+```python
+@property
+def combinations(self) -> CombsType:
+```  
+Повертає список всіх виграшних комбінацій для цієї таблиці
 * _Комбінації створюються автоматично за параметрами таблиці, або передаються врчуну коли конструюється екземпляр класу Table_
-...
+
+#### Метод table.count_free_cells:        
+```python
+@property
+def count_free_cells(self) -> int:
+```  
+Повертає кількість вільних клітинок в таблиці
+
+#### Метод table.set_symbol_cell:        
+```python
+@property
+def set_symbol_cell(self, index_row: int, index_column: int, symbol: SymbolBase):
+``` 
+Встановлює переданий символ за вказаними індексами.  
+Зменшує рахунок вільних клітинок на -1  
+    
+Примітка:
+* Саме цей метод викликає 'game.step' Див. розділ Game, пункт метод game.step
 
 ### PLAYERS
 ...
