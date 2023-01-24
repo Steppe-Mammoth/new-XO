@@ -17,7 +17,8 @@ _Скористаємося цим. **Замість класичної табл
 
 ```python
 # app.py
-from game import TableParam, TableDefault, GameConsole, Player, Players, Symbol
+from game import TableParam, TableDefault, Player, Players, Symbol
+from game.client.console import GameConsole
 
 if __name__ == "__main__":
     p1 = Player(name="Pertos_ANDROID:1", symbol=Symbol('X'), role=Player.Role.ANDROID)
@@ -30,12 +31,12 @@ if __name__ == "__main__":
     table = TableDefault(param=TableParam(ROW=7, COLUMN=7, COMBINATION=5))
     # COMBINATION - кількість клітинок яких потрібно зайняти підряд одним символом для виграшгу
 
-    game_console = GameConsole(players=players, table=table)
+    game_console = GameConsole(players=players, table=game_table)
     game_console.start_game()
 ```
 
 <details>
-  <summary>Attempt #1</summary>
+  <summary>Спроба №1</summary>
   
 ```python
 WIN: ANDROID:1 < X > | COMB: < ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5)) >
@@ -54,7 +55,7 @@ WIN: ANDROID:1 < X > | COMB: < ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5)) >
 </details>
 
 <details>
-  <summary>Attempt #2</summary>
+  <summary>Спроба №2</summary>
   
 ```python
 PEACE: ALL USED CELLS
@@ -73,7 +74,7 @@ PEACE: ALL USED CELLS
 </details>
 
 <details>
-  <summary>Attempt #3</summary>
+  <summary>Спроба №3</summary>
   
 ```python
 WIN: ANDROID:4 < O > | COMB: < ((3, 1), (3, 2), (3, 3), (3, 4), (3, 5)) >
@@ -99,20 +100,26 @@ ___Як захочете нагрузити процесор сотнею бот
 _Підемо далі_
 
 # API
-
-### GAME
+    
 ```python
-from game import TableParam, TableDefault, Player, Players, Symbol, Game
+from game import TableParam, TableDefault, Player, Players, Symbol, Game, ResultCode
 
 p1 = Player(name="Vera_ANDROID", symbol=Symbol('X'), role=Player.Role.ANDROID)
-p2 = Player(name="Andruha_PLAYER", symbol=Symbol('O'), role=Player.Role.USER)
+p2 = Player(name="Bogdan_PLAYER", symbol=Symbol('O'), role=Player.Role.USER)
 
 players = Players(players=[p1, p2])
 table = TableDefault(param=TableParam(ROW=3, COLUMN=3, COMBINATION=3))
 
 game = Game(players=players, table=table)
 ```
+    
+### GAME
+<details>
+  <summary>📂 Розгорнути</summary> 
+
 ```python
+# new game instance
+game.game_field
 +-----+---+---+---+
 | ↓/→ | 0 | 1 | 2 |
 +-----+---+---+---+
@@ -127,16 +134,18 @@ game = Game(players=players, table=table)
 def step(self, index_row: int, index_column: int, player: PlayerBase)
 ```
 ```python
-game.step(index_row=1, index_column=0, player=p2)  # my first step
+game.step(index_row=1, index_column=0, player=p2)  
+game.step(index_row=1, index_column=2, player=p2)  
+game.step(index_row=1, index_column=1, player=p2) 
 ```
 ```python
-+-----+---+---+---+
-| ↓/→ | 0 | 1 | 2 |
-+-----+---+---+---+
-|  0: | * | * | * |
-|  1: | O | * | * |
-|  2: | * | * | * |
-+-----+---+---+---+
++-----+---+---+---+   ->   +-----+---+---+---+   ->   +-----+---+---+---+  
+| ↓/→ | 0 | 1 | 2 |   ->   | ↓/→ | 0 | 1 | 2 |   ->   | ↓/→ | 0 | 1 | 2 |
++-----+---+---+---+   ->   +-----+---+---+---+   ->   +-----+---+---+---+
+|  0: | * | * | * |   ->   |  0: | * | * | * |   ->   |  0: | * | * | * |
+|  1: | O | * | * |   ->   |  1: | O | * | O |   ->   |  1: | O | O | O |
+|  2: | * | * | * |   ->   |  2: | * | * | * |   ->   |  2: | * | * | * |
++-----+---+---+---+   ->   +-----+---+---+---+   ->   +-----+---+---+---+
 ```
 Фукція встановлює символ гравця `player.symbol` в клітинку за вказаними індексами.  
 Після успішного встановлення лічильник `player.count_steps` збільшується на +1, а `game.table.count_free_cells` зменшується на -1
@@ -149,29 +158,38 @@ game.step(index_row=1, index_column=0, player=p2)  # my first step
 ```python
 def result(self, player: PlayerBase) -> GameStateT
 ```
+Перевіримо результат наших попередніх 3-ох кроків, очікуємо виграш
 ```python
 res = game.result(player=p2)
-```
-```python
-res.is_finished  # False
-assert res == game.game_state  # True
+    
+match res.code:
+    case ResultCode.NO_RESULT:
+        print('STATUS: NO RESULT')
+    case ResultCode.WINNER:
+        print(f'STATUS: WINNER. Player: {res.win_player.name}, Win comb: {res.win_combination}')
+    case ResultCode.ALL_CELLS_USED:
+        print('STATUS: DRAW')
+    
+# STATUS: WINNER. Player: Bogdan_PLAYER, Win comb: ((1, 0), (1, 1), (1, 2))
 ```
 Для заданого гравця (його символа) функція проводить 2 перевірки
 * _Пошуку виграшу, де здійснюється перевірка по комбінаціям які доступні в `game.table.combinations`_
 * _Перевірка на нічию. Порівнюється значення результату `game.table.count_free_cells`_
   
-Коли одна з двух вірогідностей дійсна, автоматично викликається метод `game_state.update`, який модифікує: `game_state`, змінюючи вньому статус `.code`, а в випадку коли гравець виграв - щей доповнює поля: `.win_player` і `.win_combination`
+Коли одна з двух вірогідностей дійсна, автоматично викликається метод `game_state.update`, який модифікує: `game_state`, змінюючи в ньому статус `.code`, а в випадку коли гравець виграв - щей доповнює поля: `.win_player` і `.win_combination` 
 
-Пілся перевірок та можливих модифікацій - повертає об'єкт: `game_state`
+Після перевірок та можливих модифікацій - повертає об'єкт: `game_state`
 
 Примітка: 
-* _Щоб дізнатися що одна з тригерів які логічно завершуює гру спрацювала - викликаєм в game_state метод: `.is_finished`, якщо True - в нас є виграш або нічия. Детальніше див. розділ GameState_
+* `assert res == game.game_state  # True`
+* _Щоб дізнатися що одна з тригерів які логічно завершуює гру спрацювала - викликаєм в game_state метод: `.is_finished`, якщо True - в нас є виграш або нічия. Якщо точніше то використовуєм `.is_winner` або `.is_draw` 
+    Детальніше див. розділ GameState_
 
 #### Метод game.step_result:
 ```python
 def step_result(self, index_row: int, index_column: int, player: PlayerBase) -> GameStateT
 ```
-Об'єднувальний метод. Замніняє почерговий виклик  `game.step` і `game.result`
+* **Об'єднувальний метод**. Заміняє почерговий виклик  `game.step` і `game.result`, повертає результат останього
 
 
 #### Метод game.ai_get_step:
@@ -180,29 +198,97 @@ def ai_get_step(self, player: PlayerBase) -> CellIndex
 ```
 Для вказаного гравця, знаходить найкращу клітинку для ходу.  
 Повертає кортеж з двома елементами (`index_row: int, index_column: int`)
+    
+* _Детальніше див. розділ AI_
 
 
 #### Метод game.ai_step:
 ```python
 def ai_step(self, player: PlayerBase)
 ```
-Об'єднувальний метод. Замніняє почерговий виклик  `game.ai_get_step` і `game.step`
+* **Об'єднувальний метод**. Заміняє почерговий виклик  `game.ai_get_step` і `game.step`
 
 #### Метод game.ai_step_result:
 ```python
 def ai_step_result(self, player: PlayerBase) -> GameStateT
 ```
-Об'єднувальний метод. Замніняє почерговий виклик  `game.ai_get_step` і `game.step_result` повертаючи результат останього
-...
+* **Об'єднувальний метод**. Заміняє почерговий виклик  `game.ai_get_step` і `game.step_result`, повертає результат останього
+    
+</details>
+    
+### TABLE 
+    
+<details>
+  <summary>📂 Розгорнути</summary> 
+    
+```python
+table = game.table
+```   
+    
+#### Метод table.combinations:    
 
-### TABLE
-
+```python
+@property
+def combinations(self) -> CombsType
+```  
+Повертає список всіх виграшних комбінацій для цієї таблиці
 * _Комбінації створюються автоматично за параметрами таблиці, або передаються врчуну коли конструюється екземпляр класу Table_
-...
 
+#### Метод table.count_free_cells:        
+```python
+@property
+def count_free_cells(self) -> int
+```  
+Повертає кількість вільних клітинок в таблиці
+
+#### Метод table.set_symbol_cell:        
+```python
+@property
+def set_symbol_cell(self, index_row: int, index_column: int, symbol: SymbolBase)
+``` 
+Встановлює переданий символ за вказаними індексами.  
+Зменшує рахунок вільних клітинок на -1  
+    
+Примітка:
+* Саме цей метод викликає 'game.step' Див. розділ Game, пункт метод `game.step`
+    
+</details>  
+    
 ### PLAYERS
-...
+    
+<details>
+  <summary>📂 Розгорнути</summary> 
+    
+```python
+PlayersT = TypeVar('PlayersT', bound=PlayersBase, covariant=True)
+    
+players = game.players
+```   
+#### Метод players.current_player:        
+```python
+@property
+def current_player(self) -> PlayerT
+```  
+Повертає поточного гравця з черги
+    
+#### Метод players.set_get_next_player:        
+```python
+def set_get_next_player(self) -> PlayerT
+```  
+Заміняє поточного гравця на наступного з черги і повертає його
+* Після цього новий поточний гравець доступний в методі `players.current_player`
+    
+#### Метод players.shuffle_players:        
+```python
+def shuffle_players(self)
+```  
+Перемішує список гравців, заміняючи існуючу чергу на нову.  
+    
+Примітка:
+* Перший гравець з нової черги буде встановлений як теперишній, і доступний в `players.current_player`
 
+</details>  
+    
 ### PLAYER
 ...
 
