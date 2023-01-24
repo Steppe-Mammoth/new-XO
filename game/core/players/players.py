@@ -26,7 +26,7 @@ class PlayersBase(ABC):
     @abstractmethod
     def set_get_next_player(self) -> PlayerT:
         """
-        Replaces the current player with the next player in line and returns it. \n
+        Replaces the current player with the next player in queue and returns it. \n
         New current player available via self.current_player
         """
         ...
@@ -50,6 +50,12 @@ class Players(PlayersBase):
         self._current_player = None
         self.__queue = None
 
+    @property
+    def current_player(self) -> PlayerT:
+        if not self._current_player:
+            self.set_get_next_player()
+        return self._current_player
+
     def set_get_next_player(self) -> PlayerT:
         return next(self)
 
@@ -57,12 +63,6 @@ class Players(PlayersBase):
         random.shuffle(self._player_list)
         self.__queue = iter(self)
         self.set_get_next_player()
-
-    @property
-    def current_player(self) -> PlayerT:
-        if not self._current_player:
-            self.set_get_next_player()
-        return self._current_player
 
     def __iter__(self):
         return cycle(self._player_list)
