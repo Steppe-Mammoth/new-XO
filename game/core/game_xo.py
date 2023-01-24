@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Optional, Type
 
 from game.core.ai import AIBase, AIDefault
@@ -10,7 +10,7 @@ from game.core.table.annotations import CombType, CellIndex
 from game.core.table.table import verify_table_instance, GameFieldType, TableT
 
 
-class GameBase:
+class GameBase(ABC):
     def __init__(self,
                  players: PlayersT,
                  table: TableT,
