@@ -1,4 +1,4 @@
-from game import TableParam, TableDefault, Player, Players, Symbol, Game
+from game import TableParam, TableDefault, Player, Players, Symbol
 from game.client.console import GameConsole
 
 if __name__ == "__main__":
