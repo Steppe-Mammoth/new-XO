@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # p4 = Player(name="PLAYER", symbol=Symbol('P'), role=Player.Role.USER)  # Якщо без вас ніяк
 
     players = Players(players=[p1, p2, p3])
-    game_table = TableDefault(param=TableParam(ROW=7, COLUMN=7, COMBINATION=5))
+    table = TableDefault(param=TableParam(ROW=7, COLUMN=7, COMBINATION=5))
     # COMBINATION - кількість клітинок яких потрібно зайняти підряд одним символом для виграшгу
 
     game_console = GameConsole(players=players, table=game_table)
@@ -36,7 +36,7 @@ if __name__ == "__main__":
 ```
 
 <details>
-  <summary>Attempt #1</summary>
+  <summary>Спроба №1</summary>
   
 ```python
 WIN: ANDROID:1 < X > | COMB: < ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5)) >
@@ -55,7 +55,7 @@ WIN: ANDROID:1 < X > | COMB: < ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5)) >
 </details>
 
 <details>
-  <summary>Attempt #2</summary>
+  <summary>Спроба №2</summary>
   
 ```python
 PEACE: ALL USED CELLS
@@ -74,7 +74,7 @@ PEACE: ALL USED CELLS
 </details>
 
 <details>
-  <summary>Attempt #3</summary>
+  <summary>Спроба №3</summary>
   
 ```python
 WIN: ANDROID:4 < O > | COMB: < ((3, 1), (3, 2), (3, 3), (3, 4), (3, 5)) >
@@ -114,6 +114,8 @@ game = Game(players=players, table=table)
 ```
     
 ### GAME
+<details>
+  <summary>📂 Розгорнути</summary> 
 
 ```python
 # new game instance
@@ -211,8 +213,14 @@ def ai_step(self, player: PlayerBase)
 def ai_step_result(self, player: PlayerBase) -> GameStateT
 ```
 * **Об'єднувальний метод**. Заміняє почерговий виклик  `game.ai_get_step` і `game.step_result`, повертає результат останього
-
+    
+</details>
+    
 ### TABLE 
+    
+<details>
+  <summary>📂 Розгорнути</summary> 
+    
 ```python
 table = game.table
 ```   
@@ -221,7 +229,7 @@ table = game.table
 
 ```python
 @property
-def combinations(self) -> CombsType:
+def combinations(self) -> CombsType
 ```  
 Повертає список всіх виграшних комбінацій для цієї таблиці
 * _Комбінації створюються автоматично за параметрами таблиці, або передаються врчуну коли конструюється екземпляр класу Table_
@@ -229,24 +237,58 @@ def combinations(self) -> CombsType:
 #### Метод table.count_free_cells:        
 ```python
 @property
-def count_free_cells(self) -> int:
+def count_free_cells(self) -> int
 ```  
 Повертає кількість вільних клітинок в таблиці
 
 #### Метод table.set_symbol_cell:        
 ```python
 @property
-def set_symbol_cell(self, index_row: int, index_column: int, symbol: SymbolBase):
+def set_symbol_cell(self, index_row: int, index_column: int, symbol: SymbolBase)
 ``` 
 Встановлює переданий символ за вказаними індексами.  
 Зменшує рахунок вільних клітинок на -1  
     
 Примітка:
-* Саме цей метод викликає 'game.step' Див. розділ Game, пункт метод game.step
-
+* Саме цей метод викликає 'game.step' Див. розділ Game, пункт метод `game.step`
+    
+</details>  
+    
 ### PLAYERS
-...
+    
+<details>
+  <summary>📂 Розгорнути</summary> 
+    
+```python
+PlayersT = TypeVar('PlayersT', bound=PlayersBase, covariant=True)
+    
+players = game.players
+```   
+#### Метод players.current_player:        
+```python
+@property
+def current_player(self) -> PlayerT
+```  
+Повертає поточного гравця з черги
+    
+#### Метод players.set_get_next_player:        
+```python
+def set_get_next_player(self) -> PlayerT
+```  
+Заміняє поточного гравця на наступного з черги і повертає його
+* Після цього новий поточний гравець доступний в методі `players.current_player`
+    
+#### Метод players.shuffle_players:        
+```python
+def shuffle_players(self)
+```  
+Перемішує список гравців, заміняючи існуючу чергу на нову.  
+    
+Примітка:
+* Перший гравець з нової черги буде встановлений як теперишній, і доступний в `players.current_player`
 
+</details>  
+    
 ### PLAYER
 ...
 
