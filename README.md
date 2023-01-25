@@ -131,7 +131,7 @@ game = Game(players=players, table=table)
 ___
 
 ### GAME 
-___Головний.___ _Відповідає за процес гри, обробку ходів, видачу результату._
+___Головний.___ _Процес гри, обробка ходів, видача результату._
 
 
 <details>
@@ -254,14 +254,14 @@ ___
 
 ___
 ### TABLE
-_Виставляє ходи в ігрове поле, і вираховує всі виграшні комбінації для себе_
+_Виставляння ходів, комбінації для таблиці_
 
 <details>
   <summary>📂 Розгорнути</summary> 
 
-___
-
-_Екземпляр Table доступний в `game.table`_
+```python
+table = game.table
+```
 
 ___
 #### - Отримати ігрове поле. `table.game_field`:
@@ -317,15 +317,15 @@ ___
 
 ### PLAYERS
  
-_Список гравців, Відповідає за їх почерговість_ 
+_Список гравців і черга_ 
    
 <details>
   <summary>📂 Розгорнути</summary> 
   
-___
 
-_Екземпляр Players доступний в `game.players`_
-
+```python
+players = game.players
+```  
 ___
 
 #### - Отримати список гравців. `players.player_list`:   
@@ -380,11 +380,21 @@ ___
 ___
 ### PLAYER
 
-_Інформація про гравця, і кількість кроків_
+_Гравець, його данні_
 
 <details>
   <summary>📂 Розгорнути</summary> 
 
+```python
+# game.core.players.player.py
+
+class Role(Enum):
+    USER = 1
+    ANDROID = 2
+```  
+```python
+player = game.current_player
+```  
 ___
 
 #### - Отримати роль. `player.role`:   
@@ -443,19 +453,131 @@ def add_count_step(self)
 Примітка:
 * Цей метод автоматично викликається в `table.set_symbol_cell`
 
-___
 
-___
 </details>  
 
 ___
 ___
 
 ### GAME STATE
-...
+
+Поточний результат гри
+
+<details>
+  <summary>📂 Розгорнути</summary> 
+
+```python
+# game.core.result.py
+
+class ResultCode(Enum):
+    NO_RESULT = 0
+    ALL_CELLS_USED = 1
+    WINNER = 2
+```  
+
+```python
+game_state = game.game_state
+```  
+
+___
+
+#### - Отримати код гри. `game_result.code`:   
+```python
+@property
+def code(self) -> ResultCode
+```  
+Повертає статус код гри:
+
+Примтіка:
+
+* _Початкове значення встановлене як `ResultCode.NO_RESULT`_
+
+___
+
+
+#### - Отримати виграшного гравця. `game_result.win_player`:   
+```python
+@property
+def win_player(self) -> Optional[PlayerBase]
+```
+Повертає виграшного гравця, якщо він був добавлений методом `game_result.update`
+
+___
+
+
+#### - Отримати виграшну комбінацію. `game_result.win_combination`:   
+```python
+@property
+def win_combination(self) -> Optional[CombType]
+```  
+Повертає виграшну комбінацію, якщо вона була добавлена методом `game_result.update`
+
+___
+
+
+#### - Гра закінчена? `game_result.is_finished`:   
+```python
+@property
+def is_finished(self) -> bool
+```  
+Повертає True якщо `game_result.code` має значення `ResultCode.ALL_CELLS_USED` або `ResultCode.WINNER`  
+Інакше - False
+
+___
+
+
+#### - Гра продовжується? `game_result.is_continues`:   
+```python
+@property
+def is_continues(self) -> bool
+```  
+Повертає True якщо `game_result.code` має значення `ResultCode.NO_RESULT`  
+Інакше - False
+
+___
+
+
+#### - Є виграш? `game_result.is_winner`:   
+```python
+@property
+def is_winner(self) -> bool
+```  
+Повертає True якщо `game_result.code` має значення `ResultCode.WINNER`  
+Інакше - False
+
+___
+
+
+#### - Є нічия? `game_result.is_draw`:   
+```python
+@property
+def is_draw(self) -> bool
+```  
+Повертає True якщо `game_result.code` має значення `ResultCode.ALL_CELLS_USED`  
+Інакше - False
+
+___
+
+
+#### - Оновити результат. `game_result.update`:   
+```python
+def update(self,
+           code: Optional[ResultCode] = None,
+           win_player: Optional[PlayerBase] = None,
+           win_combination: Optional[CombType] = None)
+```  
+Оновлює дані про поточний результат гри.
+
+Примітка:
+
+* _`game_result.code` - автоматично оновлюється коли застосовується метод `game.set_draw` або `game.set_winner`_
+* _`game_result.win_player` і `game_result.win_combination` - автоматично оновлюється коли застосовується метод `game.set_winner`_
+
+</details>
 
 ___
 ___
+
 ### AI
 
 Короткий приклад роботи:
