@@ -1,12 +1,37 @@
 # XO Tic-Tac-Toe
-_Бібліотека гри хрестики-нолики. Експерементальний функціонал з динамічними параметрами + AI_
-___
+___Library of the game tic-tac-toe + AI.___ _Experimental functionality with dynamic parameters of the game field_
 
-## Основні можливості:
-+ **Не обмежена кількість гравців в одній грі**
-+ **Створення ігрової таблиці будь-якого розміру**:  
-+ + *Вказавши потрібні параметри розміру: **рядка**, **стовбця** і **виграшної комбінації***
-+ **Алгоритм "Штучного інтелекту" працює з будь-якими параметрами гри**
+## Main advantages:
++ **Unlimited number of players in one game**
++ **Creating a playing field of any size**:
++ + *With size parameters required: **row**, **column** and **winning combination***
++ **Artificial Intelligence algorithm works with any game settings**
+
+
+  
+```python
+                                                                                10 x 10  player vs player vs player
+                                                                         +-----+---+---+---+---+---+---+---+---+---+---+
+                                   6 x 6  player vs player               | ↓/→ | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+                               +-----+---+---+---+---+---+---+           +-----+---+---+---+---+---+---+---+---+---+---+
+ 3 X 3 player vs player        | ↓/→ | 0 | 1 | 2 | 3 | 4 | 5 |           |  0: | * | * | * | * | * | * | * | * | * | * |
+   +-----+---+---+---+         +-----+---+---+---+---+---+---+           |  1: | X | * | * | * | * | * | * | O | * | * |
+   | ↓/→ | 0 | 1 | 2 |         |  0: | * | * | * | * | X | * |           |  2: | * | X | * | * | * | * | O | * | * | * |
+   +-----+---+---+---+         |  1: | * | * | * | * | O | * |           |  3: | * | * | P | * | * | P | * | * | * | * |
+   |  0: | O | * | X |         |  2: | * | * | * | * | O | * |           |  4: | * | * | * | X | O | * | * | * | * | * |
+   |  1: | * | O | * |         |  3: | X | X | X | X | O | X |           |  5: | * | * | * | O | X | * | * | * | * | * |
+   |  2: | X | * | O |         |  4: | * | * | * | * | O | * |           |  6: | * | * | O | * | * | X | * | * | * | * |
+   +-----+---+---+---+         |  5: | * | * | * | * | O | * |           |  7: | * | O | * | * | * | * | X | * | O | * |
+                               +-----+---+---+---+---+---+---+           |  8: | O | * | * | * | * | * | * | * | * | * |
+                                                                         |  9: | * | * | X | P | P | P | P | O | P | P |
+                                                                         +-----+---+---+---+---+---+---+---+---+---+---+
+```
+
+
+## Documentation:
+
+<details>
+ <summary>UA 🇺🇦</summary>
 
 ___
 
@@ -104,7 +129,7 @@ WIN: AMIGOS_ANDROID:2 < O > | COMB: < ((3, 1), (3, 2), (3, 3), (3, 4), (3, 5)) >
 якщо гра буде логічно закінчено (Є виграш / Всі клітинки зайняті == `game_console.game_state.is_finished`)
 
 * Для гравців в черзі, які повертають True для методу `player.is_android` застосовуються автоматичний пошук клітинки, 
-а для гравців які повернуть True для `player.is_user` буде запропоновано вести індекси в консолі
+а для гравців які повернуть True для `player.is_user` буде запропоновано ввести індекси в консолі
 
 </details>
 
@@ -308,7 +333,7 @@ def set_symbol_cell(self, index_row: int, index_column: int, symbol: SymbolBase)
 Зменшує рахунок вільних клітинок на -1  
     
 Примітка:
-* _Саме цей метод викликається в `game.step`_
+* _Цей метод автоматично викликається в `game.step`_
     
 </details>  
 
@@ -622,3 +647,480 @@ game.ai_step(p2)  # result in second table
 ```
 * AI алгоритм ставить в пріоритет свій виграш, розуміючи що наступного ходу для суперника вже не буде
 ___
+</details>
+
+
+___
+
+
+
+<details>
+ <summary>EU 🇬🇧</summary>
+
+___
+
+## Introduction to the library
+### Start a quick game in the console
+
+_We can set any size for the game table, and many players for the game_
+- _AI and the list of winning combinations for players are adjusted automatically_
+
+_We will use this. **Instead of the classic 3×3 table — let's create 7×7, and 3 players**
+Let the bots play with each other this time. Let's look at it._
+
+```python
+# app.py
+from game import TableParam, TableDefault, Player, Players, Symbol
+from game.client.console import GameConsole
+
+if __name__ == "__main__":
+    p1 = Player(name="PETROS_ANDROID:1", symbol=Symbol('X'), role=Player.Role.ANDROID)
+    p2 = Player(name="AMIGOS_ANDROID:2", symbol=Symbol('O'), role=Player.Role.ANDROID)
+    p3 = Player(name="GENTOS_ANDROID:3", symbol=Symbol('K'), role=Player.Role.ANDROID)
+
+    # p4 = Player(name="PLAYER", symbol=Symbol('P'), role=Player.Role.USER)  # If you want too
+
+    players = Players(players=[p1, p2, p3])
+    table = TableDefault(param=TableParam(ROW=7, COLUMN=7, COMBINATION=5))
+    # COMBINATION — the number of cells to win, with the same symbol
+
+    game_console = GameConsole(players=players, table=table)
+    game_console.start_game()
+```
+
+<details>
+  <summary>Attempt #1</summary>
+  
+```python
+WIN: PETROS_ANDROID:1 < X > | COMB: < ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5)) >
++-----+---+---+---+---+---+---+---+
+| ↓/→ | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
++-----+---+---+---+---+---+---+---+
+|  0: | O | * | * | * | K | X | K |
+|  1: | K | X | * | * | O | * | X |
+|  2: | X | K | X | O | K | O | X |
+|  3: | K | O | K | X | X | K | O |
+|  4: | K | O | X | X | X | O | X |
+|  5: | O | O | K | O | O | X | X |
+|  6: | * | * | O | K | * | K | K |
++-----+---+---+---+---+---+---+---+
+```
+</details>
+
+<details>
+  <summary>Attempt #2</summary>
+  
+```python
+PEACE: ALL USED CELLS
++-----+---+---+---+---+---+---+---+
+| ↓/→ | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
++-----+---+---+---+---+---+---+---+
+|  0: | X | K | K | O | O | O | X |
+|  1: | K | X | X | K | X | O | K |
+|  2: | X | K | O | O | O | X | K |
+|  3: | O | X | K | K | O | K | X |
+|  4: | X | O | K | O | O | X | O |
+|  5: | X | X | O | X | X | K | K |
+|  6: | K | K | X | O | K | O | X |
++-----+---+---+---+---+---+---+---+
+```
+</details>
+
+<details>
+  <summary>Attempt #3</summary>
+  
+```python
+WIN: AMIGOS_ANDROID:2 < O > | COMB: < ((3, 1), (3, 2), (3, 3), (3, 4), (3, 5)) >
++-----+---+---+---+---+---+---+---+
+| ↓/→ | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
++-----+---+---+---+---+---+---+---+
+|  0: | * | * | * | * | K | * | * |
+|  1: | * | * | * | * | K | * | * |
+|  2: | * | X | * | * | * | * | * |
+|  3: | * | O | O | O | O | O | X |
+|  4: | * | * | * | * | K | * | * |
+|  5: | * | * | * | * | * | * | * |
+|  6: | K | X | X | X | O | X | K |
++-----+---+---+---+---+---+---+---+
+```
+</details>
+
+
+<details>
+  <summary> * Brief description of GameConsole </summary> 
+
+The `.start_game` method activates a while a loop with an exit condition,
+if the game will be logically finished (There is a win / All cells are occupied == `game_console.game_state.is_finished`)
+
+* For queued players that return True for the `player.is_android` method, automatic cell search is applied, 
+players who return True for `player.is_user` will be prompted to enter indexes in the console
+
+</details>
+
+
+
+
+__If you want to load the processor with a hundred bots in a 1000×1000 field — no one will interfere!__
+_Let's go further._
+___
+
+
+# API
+___
+    
+```python
+from game import TableParam, TableDefault, Player, Players, Symbol, Game, ResultCode
+
+p1 = Player(name="VERA_ANDROID", symbol=Symbol('X'), role=Player.Role.ANDROID)
+p2 = Player(name="BOGDAN_PLAYER", symbol=Symbol('O'), role=Player.Role.USER)
+
+players = Players(players=[p1, p2])
+table = TableDefault(param=TableParam(ROW=3, COLUMN=3, COMBINATION=3))
+
+game = Game(players=players, table=table)
+```
++ ___These variables will be used when describing the methods___
+___
+
+### GAME 
+___Main.___ _The process of the game, the processing of moves, the issuing of the result._
+
+
+<details>
+  <summary>📂 Expand </summary> 
+
+___
+
+#### - Take a step. `game.step`:
+```python
+def step(self, index_row: int, index_column: int, player: PlayerBase)
+```
+```python
+# input
+game.step(index_row=1, index_column=0, player=p2)  
+game.step(index_row=1, index_column=2, player=p2)  
+game.step(index_row=1, index_column=1, player=p2) 
+```
+```python
+# output
++-----+---+---+---+   ->   +-----+---+---+---+   ->   +-----+---+---+---+  
+| ↓/→ | 0 | 1 | 2 |   ->   | ↓/→ | 0 | 1 | 2 |   ->   | ↓/→ | 0 | 1 | 2 |
++-----+---+---+---+   ->   +-----+---+---+---+   ->   +-----+---+---+---+
+|  0: | * | * | * |   ->   |  0: | * | * | * |   ->   |  0: | * | * | * |
+|  1: | O | * | * |   ->   |  1: | O | * | O |   ->   |  1: | O | O | O |
+|  2: | * | * | * |   ->   |  2: | * | * | * |   ->   |  2: | * | * | * |
++-----+---+---+---+   ->   +-----+---+---+---+   ->   +-----+---+---+---+
+```
+
+The function sets the player symbol `player.symbol` in the cell at the specified indices.
+After successful installation, the `player.count_steps` counter is incremented by +1,
+and `game.table.count_free_cells` is decreased by -1
+
+Note:
+* _If the transferred indexes do not match the possible ones in the table — an error_ `TableIndexError`
+* _If you try to set a new symbol on an already occupied cell — error_ `CellAlreadyUsedError`
+___
+
+#### - Get the result. `game.result`:
+
+```python
+def result(self, player: PlayerBase) -> GameStateT
+```
+_Let's check the result of our previous 3 steps (in the block above), we expect winnings_
+
+```python
+# input
+res = game.result(player=p2)
+    
+match res.code:
+    case ResultCode.NO_RESULT:
+        print('STATUS: NO RESULT')
+    case ResultCode.WINNER:
+        print(f'STATUS: WINNER. Player: {res.win_player.name}, Win comb: {res.win_combination}')
+    case ResultCode.ALL_CELLS_USED:
+        print('STATUS: DRAW')
+``` 
+```python   
+# output
+STATUS: WINNER. Player: BOGDAN_PLAYER, Win comb: ((1, 0), (1, 1), (1, 2))
+```
+
+For a given player, the function performs 2 checks:
+* _Check for winnings. Compares player moves with winning combinations_
+* _Checking for a tie. Checks with free cell count_
+  
+When one of the two probabilities is valid, the `game_state.update` method is automatically called, which modifies:
+`game_state`, changing the `.code` status in it, and in the case when the player won — and completing the fields:
+`.win_player` and `.win_combination`
+
+After checks and possible modifications — returns the object: `game_state`
+
+Note:
+* `assert res == game.game_state # True`
+* _A list of all winning combinations of this game is available in `game.table.combinations`_
+* _You can find out the number of free cells in `game.table.count_free_cells`_
+* _To check that one of the triggers that logically ends the game worked — call the game_state method: `.is_finished`,
+if True — you have a win or a draw. You can also use `.is_winner` or `.is_draw`.
+For more details, see GameState section_
+
+___
+
+#### - Take a step and return the result. `game.step_result`:
+
+```python
+def step_result(self, index_row: int, index_column: int, player: PlayerBase) -> GameStateT
+```
+* **Unifying function**. _Replaces the successive call of `game.step` and `game.result`,
+returns the result_
+
+---
+
+#### - AI. Get the index of the best cell for the player. `game.ai_get_step`:
+
+```python
+def ai_get_step(self, player: PlayerBase) -> CellIndex
+```
+
+AI returns a tuple with the two indices (`index_row: int, index_column: int`) of the cell
+    
+* _For more details, see AI section_
+
+---
+
+#### - AI. Make a move for a player. `game.ai_step`:
+
+```python
+def ai_step(self, player: PlayerBase)
+```
+* **Unifying function**. _Replaces the successive call of  `game.ai_get_step` and `game.step`_
+
+---
+
+#### - AI. Make a move for the player and return the result. `game.ai_step_result`:
+
+```python
+def ai_step_result(self, player: PlayerBase) -> GameStateT
+```
+* **Unifying function**. _Replaces the successive call of  `game.ai_get_step` and `game.step_result`,
+returns the result_
+    
+</details>
+
+___
+
+___
+
+
+### TABLE
+_Sets moves, combinations for the game board_
+
+<details>
+  <summary>📂 Expand </summary> 
+
+```python
+table = game.table
+```
+
+___
+#### - Get a playing field. `table.game_field`:
+
+```python
+@property
+def game_field(self) -> GameFieldType
+ ```  
+Returns a 2D list of the playing field
+
+Note:
++ _It is also available in: `game.game_field`_
+
+___
+#### - Get a list of winning combinations. `table.combinations`:    
+
+```python
+@property
+def combinations(self) -> CombsType
+```  
+
+Returns a list of all winning combinations for this table
+* _Combinations are created automatically according to the parameters of the table,
+or manually passed to the constructor of the Table class instance_
+
+___
+
+#### - Get the number of free cells. `table.count_free_cells`:   
+
+```python
+@property
+def count_free_cells(self) -> int
+```  
+Returns the number of free cells in the game filed
+
+___
+
+#### - Set the symbol in the cell. `table.set_symbol_cell`:   
+
+```python
+@property
+def set_symbol_cell(self, index_row: int, index_column: int, symbol: SymbolBase)
+``` 
+
+Sets the passed character at the specified indices of the playing field.
+Decreases the number of free cells by -1
+    
+Note:
+* _It is this method that is automatically called in `game.step`_
+    
+</details>  
+
+___
+___
+
+
+
+### PLAYERS
+ 
+_List of players and queue_ 
+   
+<details>
+  <summary>📂 Expand </summary> 
+  
+
+```python
+players = game.players
+```  
+___
+
+#### - Get a list of players. `players.player_list`:   
+
+```python
+@property
+def players_list(self) -> list[PlayerT]:
+```  
+
+Returns a list of all players
+
+Note:
+* _This list changes after using the `players.shuffle_players` method_
+    
+___
+
+
+#### - Get the current player. `players.current_player`:   
+
+```python
+@property
+def current_player(self) -> PlayerT
+```  
+
+Returns the current player from the queue
+    
+___
+
+#### - Set and get the next player. `players.set_get_next_player`:        
+
+```python
+def set_get_next_player(self) -> PlayerT
+```  
+
+Replaces the current player with the next player in the queue and returns it
+
+Note:
+* _After that, this player is available in the `players.current_player' method_
+    
+___
+
+#### - Shuffle the players list. `players.shuffle_players`:        
+```python
+def shuffle_players(self)
+```  
+Shuffles the player list and replaces the current queue with a new one.
+    
+Note:
+* _The first player from the new queue will be set as the current one, and is available in `players.current_player`_
+</details>  
+
+___
+
+___
+
+
+### PLAYER
+
+_The player, his date_
+
+<details>
+  <summary>📂 Expand </summary> 
+
+```python
+# game.core.players.player.py
+
+class Role(Enum):
+    USER = 1
+    ANDROID = 2
+```  
+```python
+player = game.current_player
+```  
+___
+
+#### - Get a role.. `player.role`:   
+```python
+@property
+def role(self) -> Role
+```
+___
+
+#### - Get a symbol. `player.symbol`:   
+```python
+@property
+def symbol(self) -> SymbolBase
+```  
+Returns an object of class Symbol of the player
+
+___
+
+#### - Get the player step count `player.count_steps`:   
+```python
+@property
+def count_steps(self) -> int
+```  
+Returns the number of steps taken by the player
+
+___
+
+#### - Is this an android? `player.is_android`:   
+```python
+@property
+def is_android(self) -> bool
+```  
+Returns True if the player has role `Role.ANDROID`
+Otherwise — False
+
+___
+
+#### - Is this a user? `player.is_user`:  
+```python
+@property
+def is_user(self) -> bool
+```  
+Returns True if the player has role `Role.USER`  
+Otherwise — False
+
+___
+
+#### - Add step for player. `player.add_count_step`:  
+```python
+def add_count_step(self)
+```  
+
+Adds +1 to the player's step counter
+
+Note:
+* This method is automatically called in `table.set_symbol_cell`
+
+
+</details>  
+
+
+
+</details>
