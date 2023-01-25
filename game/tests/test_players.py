@@ -20,7 +20,7 @@ def test_init_players():
     player_list = fast_build_player_list()
     ps = PLAYERS(players=player_list)
 
-    assert ps.player_list == player_list
+    assert ps.players_list == player_list
     assert ps.current_player == player_list[0]
 
 
@@ -68,9 +68,9 @@ def test_set_next_player2():
 def test_shuffle_players():
     player_list = fast_build_player_list()
     ps = PLAYERS(players=player_list)
-    assert ps.player_list == player_list
+    assert ps.players_list == player_list
 
     ps.shuffle_players()
-    assert player_list != ps.player_list
+    assert player_list != ps.players_list
 
-    assert ps.current_player == ps.player_list[0]
+    assert ps.current_player == ps.players_list[0]

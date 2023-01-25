@@ -68,7 +68,7 @@ def test_get_current_player_game():
     g2 = fast_build_game()
     game2 = g2.game
     game2.players.shuffle_players()
-    assert game2.current_player == game2.players.player_list[0]
+    assert game2.current_player == game2.players.players_list[0]
 
 
 def test_set_get_next_player_game():
@@ -76,13 +76,13 @@ def test_set_get_next_player_game():
     game = g.game
 
     p1 = game.set_get_next_player()
-    assert p1 == g.players.player_list[0]
+    assert p1 == g.players.players_list[0]
 
     p2 = game.set_get_next_player()
-    assert p2 == g.players.player_list[1]
+    assert p2 == g.players.players_list[1]
 
     p3 = game.set_get_next_player()
-    assert p3 == g.players.player_list[0] == p1
+    assert p3 == g.players.players_list[0] == p1
 
 
 def test_set_winner_game():

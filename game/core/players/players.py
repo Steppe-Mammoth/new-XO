@@ -11,11 +11,11 @@ PlayersT = TypeVar('PlayersT', bound='PlayersBase', covariant=True)
 
 
 class PlayersBase(ABC):
-    def __init__(self, players: MutableSequence[PlayerT]):
+    def __init__(self, players: list[PlayerT]):
         self._player_list = players
 
     @property
-    def player_list(self):
+    def players_list(self) -> list[PlayerT]:
         return self._player_list
 
     @property
