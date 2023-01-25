@@ -80,7 +80,7 @@ PEACE: ALL USED CELLS
   <summary>Спроба №3</summary>
   
 ```python
-WIN: GENTOS_ANDROID:3 < O > | COMB: < ((3, 1), (3, 2), (3, 3), (3, 4), (3, 5)) >
+WIN: AMIGOS_ANDROID:2 < O > | COMB: < ((3, 1), (3, 2), (3, 3), (3, 4), (3, 5)) >
 +-----+---+---+---+---+---+---+---+
 | ↓/→ | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
 +-----+---+---+---+---+---+---+---+
@@ -169,7 +169,7 @@ game.step(index_row=1, index_column=1, player=p2)
 
 ___
 
-#### - Отримати результат `game.result`:
+#### - Отримати результат. `game.result`:
 
 ```python
 def result(self, player: PlayerBase) -> GameStateT
@@ -211,7 +211,7 @@ STATUS: WINNER. Player: BOGDAN_PLAYER, Win comb: ((1, 0), (1, 1), (1, 2))
 
 ___
 
-#### - Зробити крок і повернути результат `game.step_result`:
+#### - Зробити крок і повернути результат. `game.step_result`:
 
 ```python
 def step_result(self, index_row: int, index_column: int, player: PlayerBase) -> GameStateT
@@ -220,7 +220,7 @@ def step_result(self, index_row: int, index_column: int, player: PlayerBase) -> 
 
 ---
 
-#### - AI. Отримати індекс найкращої клітинки для гравця `game.ai_get_step`:
+#### - AI. Отримати індекс найкращої клітинки для гравця. `game.ai_get_step`:
 
 ```python
 def ai_get_step(self, player: PlayerBase) -> CellIndex
@@ -231,16 +231,16 @@ AI повертає кортеж з двома індексами (`index_row: i
 
 ---
 
-#### - AI. Зробити хід для гравця `game.ai_step`:
+#### - AI. Зробити хід для гравця. `game.ai_step`:
 
 ```python
 def ai_step(self, player: PlayerBase)
 ```
-* **Об'єднувальний метод**. _Заміняє почерговий виклик  `game.ai_get_step` і `game.step`_
+* **Об'єднувальний метод**. _Заміняє почерговий виклик.  `game.ai_get_step` і `game.step`_
 
 ---
 
-#### - AI. Зробити хід для гравця і повернути результат `game.ai_step_result`:
+#### - AI. Зробити хід для гравця і повернути результат. `game.ai_step_result`:
 
 ```python
 def ai_step_result(self, player: PlayerBase) -> GameStateT
@@ -264,7 +264,7 @@ ___
 _Екземпляр Table доступний в `game.table`_
 
 ___
-#### - Отримати ігрове поле `table.game_field`:
+#### - Отримати ігрове поле. `table.game_field`:
 
 ```python
 @property
@@ -276,7 +276,7 @@ def game_field(self) -> GameFieldType
 + _Також доступний в `game.game_field`_
 
 ___
-#### - Отримати список виграшних комбінацій `table.combinations`:    
+#### - Отримати список виграшних комбінацій. `table.combinations`:    
 
 ```python
 @property
@@ -288,7 +288,7 @@ def combinations(self) -> CombsType
 
 ___
 
-#### - Отримати кількість вільних клітинок `table.count_free_cells`:   
+#### - Отримати кількість вільних клітинок. `table.count_free_cells`:   
 
 ```python
 @property
@@ -298,7 +298,7 @@ def count_free_cells(self) -> int
 
 ___
 
-#### - Встановити символ в клітку `table.set_symbol_cell`:   
+#### - Встановити символ в клітку. `table.set_symbol_cell`:   
 
 ```python
 @property
@@ -328,7 +328,7 @@ _Екземпляр Players доступний в `game.players`_
 
 ___
 
-#### - Отримати список гравців `players.player_list`:   
+#### - Отримати список гравців. `players.player_list`:   
 
 ```python
 @property
@@ -342,7 +342,7 @@ def players_list(self) -> list[PlayerT]:
 ___
 
 
-#### - Отримати поточного гравця `players.current_player`:   
+#### - Отримати поточного гравця. `players.current_player`:   
 
 ```python
 @property
@@ -352,7 +352,7 @@ def current_player(self) -> PlayerT
     
 ___
 
-#### - Встановити й отримати наступного гравця `players.set_get_next_player`:        
+#### - Встановити й отримати наступного гравця. `players.set_get_next_player`:        
 
 ```python
 def set_get_next_player(self) -> PlayerT
@@ -364,7 +364,7 @@ def set_get_next_player(self) -> PlayerT
     
 ___
 
-#### - Перемішати список гравців `players.shuffle_players`:        
+#### - Перемішати список гравців. `players.shuffle_players`:        
 ```python
 def shuffle_players(self)
 ```  
@@ -387,7 +387,7 @@ _Інформація про гравця, і кількість кроків_
 
 ___
 
-#### - Отримати роль `player.role`:   
+#### - Отримати роль. `player.role`:   
 ```python
 @property
 def role(self) -> Role
@@ -396,7 +396,7 @@ def role(self) -> Role
 
 ___
 
-#### - Отримати символ `player.symbol`:   
+#### - Отримати символ. `player.symbol`:   
 ```python
 @property
 def symbol(self) -> SymbolBase
@@ -405,7 +405,7 @@ def symbol(self) -> SymbolBase
 
 ___
 
-#### - Отримати кількість кроків гравця `player.count_steps`:   
+#### - Отримати кількість кроків гравця. `player.count_steps`:   
 ```python
 @property
 def count_steps(self) -> int
@@ -434,7 +434,7 @@ def is_user(self) -> bool
 
 ___
 
-#### - Додати крок для гравця `player.add_count_step`:  
+#### - Додати крок для гравця. `player.add_count_step`:  
 ```python
 def add_count_step(self)
 ```  
