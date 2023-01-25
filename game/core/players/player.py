@@ -14,10 +14,15 @@ class Role(Enum):
 
 
 class PlayerBase(ABC):
-    def __init__(self, name: str, symbol: SymbolBase):
+    def __init__(self, name: str, symbol: SymbolBase, role: Role):
         self.name = name
         self._symbol = symbol
+        self._role = role
         self._count_steps = 0
+
+    @property
+    def role(self) -> Role:
+        return self._role
 
     @property
     def symbol(self) -> SymbolBase:
@@ -49,13 +54,7 @@ class Player(PlayerBase):
     def __init__(self, name: str, symbol: SymbolBase, role: Role = Role.USER):
         verify_role(role=role)
         verify_symbol(symbol)
-        super().__init__(name=name, symbol=symbol)
-
-        self._role = role
-
-    @property
-    def role(self) -> Role:
-        return self._role
+        super().__init__(name=name, symbol=symbol, role=role)
 
     @property
     def is_android(self) -> bool:
