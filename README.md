@@ -1,12 +1,15 @@
 # XO Tic-Tac-Toe
 ___Library of the game tic-tac-toe + AI.___ _Experimental functionality with dynamic parameters of the game field_
 
+___
+
 ## Main advantages:
 + **Unlimited number of players in one game**
 + **Creating a playing field of any size**:
 + + *With size parameters required: **row**, **column** and **winning combination***
 + **Artificial Intelligence algorithm works with any game settings**
 
+___
 
   
 ```python
@@ -27,6 +30,10 @@ ___Library of the game tic-tac-toe + AI.___ _Experimental functionality with dyn
                                                                         |  9: | * | * | X | P | P | P | P | O | P | P |
                                                                         +-----+---+---+---+---+---+---+---+---+---+---+
 ```
+
+
+___
+___
 
 
 ## Documentation:
@@ -218,19 +225,14 @@ match res.code:
 STATUS: WINNER. Player: BOGDAN_PLAYER, Win comb: ((1, 0), (1, 1), (1, 2))
 ```
 Для заданого гравця функція проводить 2 перевірки:
-* _Пошуку виграшу. Звіряється з виграшними комбінаціями_
-* _Перевірка на нічию. Звіряється з показником вільних клітинок_
+* _Пошуку виграшу. Звіряється з виграшними комбінаціями `game.table.combinations`_
+* _Перевірка на нічию. Звіряється з показником вільних клітинок `game.table.count_free_cells`_
   
-Коли одна з двух вірогідностей дійсна, автоматично викликається метод `game_state.update`, який модифікує: `game_state`,
-змінюючи в ньому статус `.code`, а в випадку коли гравець виграв — ще й доповнює поля:
-`.win_player` і `.win_combination` 
-
-Після перевірок та можливих модифікацій — повертає об'єкт: `game_state`
+Коли одна з двох вірогідностей дійсна, автоматично викликається метод `game.set_winner` або `game.set_draw`
+Після перевірок та можливих модифікацій — повертає об'єкт: `game.game_state`
 
 Примітка: 
 * `assert res == game.game_state  # True`
-* _Список всіх виграшних комбінацій цієї гри доступний в `game.table.combinations`_
-* _Дізнатися залишок вільних клітинок можна в `game.table.count_free_cells`_
 * _Щоб перевірити що одна з тригерів які логічно завершує гру спрацювала — викликаємо в game_state метод: `.is_finished`,
 якщо True - в нас є виграш або нічия. Також можете використати `.is_winner` або `.is_draw`.  
 Детальніше див. розділ GameState_
@@ -273,12 +275,48 @@ def ai_step_result(self, player: PlayerBase) -> GameStateT
 ```
 * **Об'єднувальний метод**. _Заміняє почерговий виклик  `game.ai_get_step` і `game.step_result`,
 повертає результат останнього_
-    
+   
+
+___
+
+#### - Встановити переможця. `game.set_winner`:
+
+```python
+def set_winner(self, player: PlayerBase, win_combination)
+```
+
+Оновлює результат гри в об'єкті `game.game_state`, замінюючи  `game.game_state.code` на `ResultCode.WINNER`, і
+додає результат виграшу в поля `game.game_state.win_player` і `game.game_state.win_combination` 
+
+Примітка:
+
+* _Цей метод автоматично викликається в роботі методу `game.result`, якщо спрацьовує тригер перемоги_
+* _Оновлення результату виконується через метод `game.game_result.update`_
+ 
+___
+
+#### - Встановити нічию. `game.set_draw`:
+
+```python
+def set_draw(self)
+```
+
+Оновлює результат гри в об'єкті `game.game_state`, замінюючи `game.game_state.code` на `ResultCode.ALL_CELLS_USED`,  
+
+Примітка:
+
+* _Цей метод автоматично викликається в роботі методу `game.result`, якщо спрацьовує тригер нічиєї_
+* _Оновлення результату виконується через метод `game.game_result.update`_
+
+  
+  
 </details>
 
-___
 
 ___
+___
+
+
 ### TABLE
 _Виставляння ходів, комбінації для таблиці_
 
@@ -490,7 +528,7 @@ ___
 Поточний результат гри
 
 <details>
-  <summary>📂 Розгорнути</summary> 
+  <summary>📂 Розгорнути </summary> 
 
 ```python
 # game.core.result.py
@@ -514,7 +552,7 @@ def code(self) -> ResultCode
 ```  
 Повертає статус код гри:
 
-Примтіка:
+Примітка:
 
 * _Початкове значення встановлене як `ResultCode.NO_RESULT`_
 
@@ -526,7 +564,7 @@ ___
 @property
 def win_player(self) -> Optional[PlayerBase]
 ```
-Повертає виграшного гравця, якщо він був добавлений методом `game_result.update`
+Повертає виграшного гравця, якщо він був доданий методом `game_result.update`
 
 ___
 
@@ -536,7 +574,7 @@ ___
 @property
 def win_combination(self) -> Optional[CombType]
 ```  
-Повертає виграшну комбінацію, якщо вона була добавлена методом `game_result.update`
+Повертає виграшну комбінацію, якщо вона була доданий методом `game_result.update`
 
 ___
 
@@ -597,7 +635,9 @@ def update(self,
 Примітка:
 
 * _`game_result.code` - автоматично оновлюється коли застосовується метод `game.set_draw` або `game.set_winner`_
-* _`game_result.win_player` і `game_result.win_combination` - автоматично оновлюється коли застосовується метод `game.set_winner`_
+* _`game_result.win_player` і `game_result.win_combination` -  
+автоматично оновлюється коли застосовується метод `game.set_winner`_  
+Детальніше див. розділ Game, методи: `game.set_draw` і `game.set_winner`
 
 </details>
 
@@ -606,7 +646,12 @@ ___
 
 ### AI
 
-Короткий приклад роботи:
+Короткий приклад роботи
+
+<details>
+  <summary> 📂 Розгорнути </summary> 
+
+
 ```python
 p1 = Player(name="PLAYER", symbol=Symbol('X'))
 p2 = Player(name="ANDROID", symbol=Symbol('O'))
@@ -646,13 +691,16 @@ game.ai_step(p2)  # result in second table
 |  2: | X | * | O |   ->   |  2: | X | * | O |
 +-----+---+---+---+   ->   +-----+---+---+---+
 ```
-* AI алгоритм ставить в пріоритет свій виграш, розуміючи що наступного ходу для суперника вже не буде
+
+* AI алгоритм ставить в пріоритет свій виграш, розуміючи що наступного виграшного ходу для суперника — вже не буде
 ___
+
 </details>
 
 
 ___
 
+</details>
 
 
 <details>
@@ -762,6 +810,7 @@ players who return True for `player.is_user` will be prompted to enter indexes i
 
 
 __If you want to load the processor with a hundred bots in a 1000×1000 field — no one will interfere!__
+
 _Let's go further._
 ___
 
@@ -847,21 +896,17 @@ STATUS: WINNER. Player: BOGDAN_PLAYER, Win comb: ((1, 0), (1, 1), (1, 2))
 ```
 
 For a given player, the function performs 2 checks:
-* _Check for winnings. Compares player moves with winning combinations_
-* _Checking for a tie. Checks with free cell count_
+* _Check for winnings. Compares player moves with winning combinations `game.table.combinations`_
+* _Checking for a tie. Checks with free cell count `game.table.count_free_cells`_
   
-When one of the two probabilities is valid, the `game_state.update` method is automatically called, which modifies:
-`game_state`, changing the `.code` status in it, and in the case when the player won — and completing the fields:
-`.win_player` and `.win_combination`
+When one of the two probabilities is valid, the `game.set_winner` or `game.set_draw` method is automatically called  
+After checks and possible modifications — returns the object: `game.game_state`
 
-After checks and possible modifications — returns the object: `game_state`
 
 Note:
 * `assert res == game.game_state # True`
-* _A list of all winning combinations of this game is available in `game.table.combinations`_
-* _You can find out the number of free cells in `game.table.count_free_cells`_
 * _To check that one of the triggers that logically ends the game worked — call the game_state method: `.is_finished`,
-if True — you have a win or a draw. You can also use `.is_winner` or `.is_draw`.
+if True — you have a win or a draw. You can also use `.is_winner` or `.is_draw`.  
 For more details, see GameState section_
 
 ___
@@ -904,8 +949,44 @@ def ai_step_result(self, player: PlayerBase) -> GameStateT
 ```
 * **Unifying function**. _Replaces the successive call of  `game.ai_get_step` and `game.step_result`,
 returns the result_
-    
+
+___
+
+#### - Set the winner. `game.set_winner`:
+
+```python
+def set_winner(self, player: PlayerBase, win_combination)
+```
+
+Updates the game result in the `game.game_state` object, replacing `game.game_state.code` with
+`ResultCode.WINNER`, and
+adds the winning result to the `game.game_state.win_player` and `game.game_state.win_combination` fields
+
+Note:
+
+* _This method is automatically called in the `game.result` method if the win trigger fires_
+* _The result is updated via the `game.game_result.update` method_
+
+___
+
+#### - Set a draw `game.set_draw`:
+
+```python
+def set_draw(self)
+```
+
+Updates the game result in the `game.game_state`, object, replacing `game.game_state.code`
+with `ResultCode.ALL_CELLS_USED` 
+
+Note:
+
+* _This method is automatically called in the `game.result` method if a draw trigger fires_
+* _The result is updated via the `game.game_result.update` method_
+
+
+
 </details>
+
 
 ___
 
@@ -1122,6 +1203,193 @@ Note:
 
 </details>  
 
+___
+___
+
+
+### GAME STATE
+
+Current game information
+
+<details>
+  <summary>📂 Expand </summary> 
+
+```python
+# game.core.result.py
+
+class ResultCode(Enum):
+    NO_RESULT = 0
+    ALL_CELLS_USED = 1
+    WINNER = 2
+```  
+
+```python
+game_state = game.game_state
+```  
+
+___
+
+#### - Get game status code. `game_result.code`:   
+```python
+@property
+def code(self) -> ResultCode
+```  
+
+Returns the status code of the game
+
+Note:
+
+* _The initial value is set to `Result Code.NO_RESULT`_
+
+___
+
+
+#### - Get the winning player. `game_result.win_player`:   
+```python
+@property
+def win_player(self) -> Optional[PlayerBase]
+```
+
+Returns the winning player if it was added by the `game_result.update` method
+
+___
+
+
+#### - Get a winning combination. `game_result.win_combination`:   
+```python
+@property
+def win_combination(self) -> Optional[CombType]
+```  
+
+Returns the winning combination if it was added by the `game_result.update` method
+
+___
+
+
+#### - Game is over? `game_result.is_finished`:   
+```python
+@property
+def is_finished(self) -> bool
+```  
+
+Returns True if `game_result.code` is `ResultCode.ALL_CELLS_USED` or `ResultCode.WINNER`  
+Otherwise — False
+
+___
+
+
+#### - Is the game still on? `game_result.is_continues`:   
+```python
+@property
+def is_continues(self) -> bool
+```  
+Returns True if `game_result.code` is `ResultCode.NO_RESULT`  
+Otherwise — False
+
+___
+
+
+#### - Is there a win? `game_result.is_winner`:   
+```python
+@property
+def is_winner(self) -> bool
+```  
+Returns True if `game_result.code` is `ResultCode.WINNER`  
+Otherwise — False
+
+___
+
+
+#### - Is there a draw? `game_result.is_draw`:   
+```python
+@property
+def is_draw(self) -> bool
+```  
+Returns True if `game_result.code` is `ResultCode.ALL_CELLS_USED`  
+Otherwise — False
+
+___
+
+
+#### - Update result. `game_result.update`:   
+```python
+def update(self,
+           code: Optional[ResultCode] = None,
+           win_player: Optional[PlayerBase] = None,
+           win_combination: Optional[CombType] = None)
+```  
+Updates data about the current game result.
+
+Note:
+
+* _`game_result.code` - automatically updated when the `game.set_draw` or `game.set_winner` method is used_
+* _`game_result.win_player` and `game_result.win_combination` -  
+automatically updated when the `game.set_winner` method is used_  
+For more details, see section Game, methods: `game.set_draw` and `game.set_winner`
+
+</details>
+
+___
+___
+
+
+### AI
+
+A short work example:
+
+<details>
+  <summary> 📂 Expand </summary> 
+
+```python
+p1 = Player(name="PLAYER", symbol=Symbol('X'))
+p2 = Player(name="ANDROID", symbol=Symbol('O'))
+...
+```
+```python
+game.step(2, 2, player=p1)
+game.step(0, 0, player=p1)
+
+game.ai_step(p2)  # result in second table
+
++-----+---+---+---+   ->   +-----+---+---+---+
+| ↓/→ | 0 | 1 | 2 |   ->   | ↓/→ | 0 | 1 | 2 |
++-----+---+---+---+   ->   +-----+---+---+---+
+|  0: | X | * | * |   ->   |  0: | X | * | * |
+|  1: | * | * | * |   ->   |  1: | * | O | * |
+|  2: | * | * | X |   ->   |  2: | * | * | X |
++-----+---+---+---+   ->   +-----+---+---+---+
+```
+* The AI algorithm understands that the opponent's next move is likely to collect a winning combination, so it blocks it
+
+Let's consider the second situation
+
+```python
+game.step(0, 0, player=p1)  # X
+game.step(2, 0, player=p1)  # X
+
+game.step(0, 2, player=p2)  # O
+game.step(2, 2, player=p2)  # O
+
+game.ai_step(p2)  # result in second table
+
++-----+---+---+---+   ->   +-----+---+---+---+
+| ↓/→ | 0 | 1 | 2 |   ->   | ↓/→ | 0 | 1 | 2 |
++-----+---+---+---+   ->   +-----+---+---+---+
+|  0: | X | * | O |   ->   |  0: | X | * | O |
+|  1: | * | * | * |   ->   |  1: | * | * | O |
+|  2: | X | * | O |   ->   |  2: | X | * | O |
++-----+---+---+---+   ->   +-----+---+---+---+
+```
+* The AI algorithm prioritizes its own winnings,
+with the understanding that there will be no next winning move for the opponent
+___
+</details>
+
+
+___
 
 
 </details>
+
+___
+___
