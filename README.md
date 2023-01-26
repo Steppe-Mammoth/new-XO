@@ -44,7 +44,13 @@ ___
 ___
 
 ## Знайомство з бібліотекою
-### Старт швидкої гри в консолі
+
+### Старт швидкої гри в консолі. `GameConsole`
+Демо гра в консолі
+
+<details>
+ <summary> 🤖 Розгорнути </summary>
+
 _Ми можемо задати будь-який розмір для ігрової таблиці та безліч гравців для гри_ 
 - _AI й перелік виграшних комбінацій для гравців підлаштуються автоматично_
 
@@ -144,9 +150,12 @@ WIN: AMIGOS_ANDROID:2 < O > | COMB: < ((3, 1), (3, 2), (3, 3), (3, 4), (3, 5)) >
 
 __Як захочете нагрузити процесор сотнею ботів в 1000х1000 полі — ніхто не завадить!__
 _Підемо далі_
+
+</details>
+
 ___
 
-# API
+## API:
 ___
     
 ```python
@@ -709,7 +718,12 @@ ___
 ___
 
 ## Introduction to the library
-### Start a quick game in the console
+
+### Start a quick game in the console `GameConsole`
+Demo game in console
+
+<details>
+ <summary> 🤖 Expand </summary>
 
 _We can set any size for the game table, and many players for the game_
 - _AI and the list of winning combinations for players are adjusted automatically_
@@ -812,10 +826,13 @@ players who return True for `player.is_user` will be prompted to enter indexes i
 __If you want to load the processor with a hundred bots in a 1000×1000 field — no one will interfere!__
 
 _Let's go further._
+
+</details>
+
 ___
 
 
-# API
+## API:
 ___
     
 ```python
