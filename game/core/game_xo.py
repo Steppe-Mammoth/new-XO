@@ -43,6 +43,14 @@ class GameBase(ABC):
     def game_state(self) -> GameStateT:
         return self._game_state
 
+    def set_get_next_player(self) -> PlayerT:
+        """
+        Replaces the current player with the next player in line and returns it.
+        New current player available via self.current_player
+        * this function is the same as self.table.set_get_next_player
+        """
+        return self._players.set_get_next_player()
+
     @abstractmethod
     def step(self, index_row: int, index_column: int, player: PlayerBase):
         """
@@ -106,14 +114,6 @@ class GameBase(ABC):
         * Replaces the result code.
         """
 
-    @abstractmethod
-    def set_get_next_player(self) -> PlayerT:
-        """
-        Replaces the current player with the next player in line and returns it.
-        New current player available via self.current_player
-        * this function is the same as self.table.set_get_next_player
-        """
-
 
 class Game(GameBase):
     def __init__(self,
@@ -165,9 +165,6 @@ class Game(GameBase):
 
     def set_draw(self):
         self.game_state.update(code=ResultCode.ALL_CELLS_USED)
-
-    def set_get_next_player(self) -> PlayerT:
-        return self._players.set_get_next_player()
 
     def _get_win_comb(self, player: PlayerBase) -> Optional[CombType]:
         return self._checker.result_player(player.symbol,
