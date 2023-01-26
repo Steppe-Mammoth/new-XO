@@ -38,18 +38,17 @@ ___
 
 ## ***Documentation***
 
-[Start a quick game in the console](https://github.com/Steppe-Mammoth/new-XO#start-a-quick-game-in-the-console-gameconsole)
+[*Start a quick game in the console*](https://github.com/Steppe-Mammoth/new-XO#start-a-quick-game-in-the-console-gameconsole)
 
-[API:](https://github.com/Steppe-Mammoth/new-XO#api) 
-* [Game:](https://github.com/Steppe-Mammoth/new-XO#game) 
-* [Table:](https://github.com/Steppe-Mammoth/new-XO#table) 
-* [Players:](https://github.com/Steppe-Mammoth/new-XO#players) 
-* [Player:](https://github.com/Steppe-Mammoth/new-XO#player) 
-* [Game State:](https://github.com/Steppe-Mammoth/new-XO#game-state) 
-* [AI:](https://github.com/Steppe-Mammoth/new-XO#ai) 
+[**API:**](https://github.com/Steppe-Mammoth/new-XO#api) 
+* [Game](https://github.com/Steppe-Mammoth/new-XO#game) 
+* [Table](https://github.com/Steppe-Mammoth/new-XO#table) 
+* [Players](https://github.com/Steppe-Mammoth/new-XO#players) 
+* [Player](https://github.com/Steppe-Mammoth/new-XO#player) 
+* [Game State](https://github.com/Steppe-Mammoth/new-XO#game-state) 
+* [AI](https://github.com/Steppe-Mammoth/new-XO#ai) 
 
-[Translations into other languages:](https://github.com/Steppe-Mammoth/new-XO#translations-into-other-languages)
-* [UA ukraine:](https://github.com/Steppe-Mammoth/new-XO#%D0%B7%D0%BD%D0%B0%D0%B9%D0%BE%D0%BC%D1%81%D1%82%D0%B2%D0%BE-%D0%B7-%D0%B1%D1%96%D0%B1%D0%BB%D1%96%D0%BE%D1%82%D0%B5%D0%BA%D0%BE%D1%8E) 
+[*Translations into other languages:*](https://github.com/Steppe-Mammoth/new-XO#translations-into-other-languages)
 
 ___
 
