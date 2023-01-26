@@ -154,9 +154,10 @@ _Підемо далі_
 </details>
 
 ___
+___
 
 ## API:
-___
+
     
 ```python
 from game import TableParam, TableDefault, Player, Players, Symbol, Game, ResultCode
@@ -170,6 +171,7 @@ table = TableDefault(param=TableParam(ROW=3, COLUMN=3, COMBINATION=3))
 game = Game(players=players, table=table)
 ```
 + ___Ці змінні будуть використовуватись при описі методів___
+
 ___
 
 ### GAME 
@@ -833,7 +835,6 @@ ___
 
 
 ## API:
-___
     
 ```python
 from game import TableParam, TableDefault, Player, Players, Symbol, Game, ResultCode
@@ -847,6 +848,7 @@ table = TableDefault(param=TableParam(ROW=3, COLUMN=3, COMBINATION=3))
 game = Game(players=players, table=table)
 ```
 + ___These variables will be used when describing the methods___
+
 ___
 
 ### GAME 
