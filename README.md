@@ -38,7 +38,7 @@ ___
 
 ## ***Documentation***
 
-[*Start a quick game in the console*](https://github.com/Steppe-Mammoth/new-XO#start-a-quick-game-in-the-console-gameconsole)
+[*Start a quick game in the console*](https://github.com/Steppe-Mammoth/tictaco#start-a-quick-game-in-the-console-gameconsole)
 
 [**API:**](https://github.com/Steppe-Mammoth/tictaco#api) 
 * [Game](https://github.com/Steppe-Mammoth/tictaco#game) 
@@ -48,7 +48,7 @@ ___
 * [Game State](https://github.com/Steppe-Mammoth/tictaco#game-state) 
 * [AI](https://github.com/Steppe-Mammoth/tictaco#ai) 
 
-[*Translations into other languages:*](https://github.com/Steppe-Mammoth/new-XO#translations-into-other-languages)
+[*Translations into other languages:*](https://github.com/Steppe-Mammoth/tictaco#translations-into-other-languages)
 
 ___
 
