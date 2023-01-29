@@ -38,17 +38,17 @@ ___
 
 ## ***Documentation***
 
-[*Start a quick game in the console*](https://github.com/Steppe-Mammoth/tictaco#start-a-quick-game-in-the-console-gameconsole)
+[*Start a quick game in the console*](https://github.com/Steppe-Mammoth/titato#start-a-quick-game-in-the-console-gameconsole)
 
-[**API:**](https://github.com/Steppe-Mammoth/tictaco#api) 
-* [Game](https://github.com/Steppe-Mammoth/tictaco#game) 
-* [Table](https://github.com/Steppe-Mammoth/tictaco#table) 
-* [Players](https://github.com/Steppe-Mammoth/tictaco#players) 
-* [Player](https://github.com/Steppe-Mammoth/tictaco#player) 
-* [Game State](https://github.com/Steppe-Mammoth/tictaco#game-state) 
-* [AI](https://github.com/Steppe-Mammoth/tictaco#ai) 
+[**API:**](https://github.com/Steppe-Mammoth/titato#api) 
+* [Game](https://github.com/Steppe-Mammoth/titato#game) 
+* [Table](https://github.com/Steppe-Mammoth/titato#table) 
+* [Players](https://github.com/Steppe-Mammoth/titato#players) 
+* [Player](https://github.com/Steppe-Mammoth/titato#player) 
+* [Game State](https://github.com/Steppe-Mammoth/titato#game-state) 
+* [AI](https://github.com/Steppe-Mammoth/titato#ai) 
 
-[*Translations into other languages:*](https://github.com/Steppe-Mammoth/tictaco#translations-into-other-languages)
+[*Translations into other languages:*](https://github.com/Steppe-Mammoth/titato#translations-into-other-languages)
 
 ___
 
@@ -67,23 +67,23 @@ _We will use this. **Instead of the classic 3×3 table — let's create 7×7, an
 Let the bots play with each other this time. Let's look at it._
 
 ```python
-# app.py
-from game import TableParam, TableDefault, Player, Players, Symbol
-from game.client.console import GameConsole
+from titato.client import GameConsole
+from titato.core.player import Player, Players, Symbol
+from titato.core.table import Table, TableParam
+
 
 if __name__ == "__main__":
     p1 = Player(name="PETROS_ANDROID:1", symbol=Symbol('X'), role=Player.Role.ANDROID)
     p2 = Player(name="AMIGOS_ANDROID:2", symbol=Symbol('O'), role=Player.Role.ANDROID)
     p3 = Player(name="GENTOS_ANDROID:3", symbol=Symbol('K'), role=Player.Role.ANDROID)
 
-    # p4 = Player(name="PLAYER", symbol=Symbol('P'), role=Player.Role.USER)  # If you want too
+    # p4 = Player(name="PLAYER", symbol=Symbol('P'), role=Player.Role.USER)
 
     players = Players(players=[p1, p2, p3])
-    table = TableDefault(param=TableParam(ROW=7, COLUMN=7, COMBINATION=5))
-    # COMBINATION — the number of cells to win, with the same symbol
+    table = Table(param=TableParam(ROW=7, COLUMN=7, COMBINATION=5))
 
-    game_console = GameConsole(players=players, table=table)
-    game_console.start_game()
+    game = GameConsole(players=players, table=table)
+    game.start_game()
 ```
 
 <details>
@@ -170,7 +170,9 @@ ___
 ## API:
     
 ```python
-from game import TableParam, TableDefault, Player, Players, Symbol, Game, ResultCode
+from titato.core.game import Game
+from titato.core.player import Player, Players, Symbol
+from titato.core.table import Table, TableParam
 
 p1 = Player(name="VERA_ANDROID", symbol=Symbol('X'), role=Player.Role.ANDROID)
 p2 = Player(name="BOGDAN_PLAYER", symbol=Symbol('O'), role=Player.Role.USER)
