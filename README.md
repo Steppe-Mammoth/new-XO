@@ -40,13 +40,13 @@ ___
 
 [*Start a quick game in the console*](https://github.com/Steppe-Mammoth/new-XO#start-a-quick-game-in-the-console-gameconsole)
 
-[**API:**](https://github.com/Steppe-Mammoth/new-XO#api) 
-* [Game](https://github.com/Steppe-Mammoth/new-XO#game) 
-* [Table](https://github.com/Steppe-Mammoth/new-XO#table) 
-* [Players](https://github.com/Steppe-Mammoth/new-XO#players) 
-* [Player](https://github.com/Steppe-Mammoth/new-XO#player) 
-* [Game State](https://github.com/Steppe-Mammoth/new-XO#game-state) 
-* [AI](https://github.com/Steppe-Mammoth/new-XO#ai) 
+[**API:**](https://github.com/Steppe-Mammoth/tictaco#api) 
+* [Game](https://github.com/Steppe-Mammoth/tictaco#game) 
+* [Table](https://github.com/Steppe-Mammoth/tictaco#table) 
+* [Players](https://github.com/Steppe-Mammoth/tictaco#players) 
+* [Player](https://github.com/Steppe-Mammoth/tictaco#player) 
+* [Game State](https://github.com/Steppe-Mammoth/tictaco#game-state) 
+* [AI](https://github.com/Steppe-Mammoth/tictaco#ai) 
 
 [*Translations into other languages:*](https://github.com/Steppe-Mammoth/new-XO#translations-into-other-languages)
 
