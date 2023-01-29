@@ -1,4 +1,4 @@
-# XO Tic-Tac-Toe
+# tictaco
 ___Library of the game tic-tac-toe + AI.___ _Experimental functionality with dynamic parameters of the game field_
 
 ___
