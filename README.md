@@ -488,7 +488,7 @@ _The player, his date_
   <summary>📂 Expand </summary> 
 
 ```python
-# game.core.players.player.py
+# titato.core.player.player.py
 
 class Role(Enum):
     USER = 1
@@ -569,7 +569,7 @@ Current game information
   <summary>📂 Expand </summary> 
 
 ```python
-# game.core.result.py
+# titato.core.game.result.py
 
 class ResultCode(Enum):
     NO_RESULT = 0
@@ -767,23 +767,23 @@ _Скористаємося цим. **Замість класичної табл
 Цього разу боти хай грають один з одним. Поглянемо на це_
 
 ```python
-# app.py
-from game import TableParam, TableDefault, Player, Players, Symbol
-from game.client.console import GameConsole
+from titato.client import GameConsole
+from titato.core.player import Player, Players, Symbol
+from titato.core.table import Table, TableParam
+
 
 if __name__ == "__main__":
     p1 = Player(name="PETROS_ANDROID:1", symbol=Symbol('X'), role=Player.Role.ANDROID)
     p2 = Player(name="AMIGOS_ANDROID:2", symbol=Symbol('O'), role=Player.Role.ANDROID)
     p3 = Player(name="GENTOS_ANDROID:3", symbol=Symbol('K'), role=Player.Role.ANDROID)
 
-    # p4 = Player(name="PLAYER", symbol=Symbol('P'), role=Player.Role.USER)  # Якщо без вас ніяк
+    # p4 = Player(name="PLAYER", symbol=Symbol('P'), role=Player.Role.USER)
 
     players = Players(players=[p1, p2, p3])
-    table = TableDefault(param=TableParam(ROW=7, COLUMN=7, COMBINATION=5))
-    # COMBINATION - кількість клітинок для виграшу, зібраних підряд одним символом
+    table = Table(param=TableParam(ROW=7, COLUMN=7, COMBINATION=5))
 
-    game_console = GameConsole(players=players, table=table)
-    game_console.start_game()
+    game = GameConsole(players=players, table=table)
+    game.start_game()
 ```
 
 <details>
@@ -869,7 +869,9 @@ ___
 
     
 ```python
-from game import TableParam, TableDefault, Player, Players, Symbol, Game, ResultCode
+from titato.core.game import Game
+from titato.core.player import Player, Players, Symbol
+from titato.core.table import Table, TableParam
 
 p1 = Player(name="VERA_ANDROID", symbol=Symbol('X'), role=Player.Role.ANDROID)
 p2 = Player(name="BOGDAN_PLAYER", symbol=Symbol('O'), role=Player.Role.USER)
@@ -1170,7 +1172,7 @@ _Гравець, його данні_
   <summary>📂 Розгорнути</summary> 
 
 ```python
-# game.core.players.player.py
+# titato.core.player.player.py
 
 class Role(Enum):
     USER = 1
@@ -1251,7 +1253,7 @@ ___
   <summary>📂 Розгорнути </summary> 
 
 ```python
-# game.core.result.py
+# titato.core.game.result.py
 
 class ResultCode(Enum):
     NO_RESULT = 0
